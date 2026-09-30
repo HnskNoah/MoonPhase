@@ -20,7 +20,7 @@ function heroPanel() {
 </div>`
 }
 
-function heroSection(posts) {
+function heroSection(posts, groups) {
   const latest = posts[0]
   return `<section class="hero">
   <div class="hero-text">
@@ -36,7 +36,7 @@ function heroSection(posts) {
       <a class="btn" href="${url(`/posts/${latest.slug}/`)}">读最新一条 ${arrow}</a>
     </div>
     <ul class="hero-tags">
-      ${posts.slice(0, 12).flatMap((p) => p.tagItems).slice(0, 6).map((t, i) =>
+      ${groups.slice(0, 6).map((t, i) =>
         `<li style="--i:${i}"><a href="${url(`/tags/${t.key}/`)}">${escapeHtml(t.label)}</a></li>`).join('')}
     </ul>
   </div>
@@ -78,9 +78,9 @@ function listSection(title, latin, posts, offset = 0) {
 </section>`
 }
 
-export function renderHome({ posts, dev }) {
+export function renderHome({ posts, groups, dev }) {
   const body = `
-  ${heroSection(posts)}
+  ${heroSection(posts, groups)}
   ${featuredSection(posts.find((p) => p.pinned) || posts[0])}
   ${listSection('最近的记录', 'RECENT', posts.filter((p) => !p.pinned).slice(0, 5), 1)}
   <section class="section quote-block">

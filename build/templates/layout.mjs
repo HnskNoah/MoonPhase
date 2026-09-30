@@ -1,8 +1,8 @@
 import { config, url, absUrl } from '../context.mjs'
 import { escapeHtml, fmtDateLatin, roman } from '../lib/util.mjs'
 
-const THEME_BOOTSTRAP = `
-<script>(function(){try{var t=localStorage.getItem('p3-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+const NIGHT_BOOTSTRAP = `
+<script>(function(){try{var n=localStorage.getItem('p3-night');if(n===null)n=window.matchMedia('(prefers-color-scheme: dark)').matches?'1':'0';if(n==='1')document.documentElement.setAttribute('data-theme','night');}catch(e){}})();</script>
 `
 
 const LIVE_RELOAD = `
@@ -55,7 +55,7 @@ export function layout({ title, description, body = '', path: pagePath = '/', ac
   const desc = description || config.description
   const canonical = absUrl(pagePath)
   return `<!doctype html>
-<html lang="${config.locale || 'zh-CN'}" data-theme="${escapeHtml(config.theme || 'reload')}">
+<html lang="${config.locale || 'zh-CN'}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,15 +73,14 @@ export function layout({ title, description, body = '', path: pagePath = '/', ac
 <link rel="alternate" type="application/rss+xml" title="${escapeHtml(config.title)}" href="${url('/feed.xml')}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,800;0,900;1,600;1,800;1,900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,800;0,900;1,400;1,600;1,800;1,900&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
 <link rel="stylesheet" href="${url('/assets/main.css')}">
-${THEME_BOOTSTRAP}${head}
+${NIGHT_BOOTSTRAP}${head}
 </head>
 <body class="${bodyClass}" data-posts="${postsCount}">
 <div class="sea" aria-hidden="true">
   <div class="sea-surface"></div>
   <div class="sea-rays"></div>
-  <canvas id="caustics" class="sea-canvas"></canvas>
   <div class="sea-vignette"></div>
   <div class="sea-grain"></div>
 </div>
@@ -103,11 +102,10 @@ ${THEME_BOOTSTRAP}${head}
   <nav id="site-nav" class="site-nav" aria-label="主导航">${navItems(active)}</nav>
   <div class="head-tools">
     <time class="dark-clock" id="dark-clock" title="Dark Hour 时钟">--:--</time>
-    <div class="theme-switch" id="theme-switch" role="group" aria-label="界面主题">
-      <button class="ts-opt" type="button" data-set-theme="reload"><span class="ts-flag"></span><span class="ts-text">RELOAD</span></button>
-      <button class="ts-opt" type="button" data-set-theme="abyss"><span class="ts-flag"></span><span class="ts-text">ABYSS</span></button>
-      <button class="ts-opt" type="button" data-set-theme="darkhour"><span class="ts-flag"></span><span class="ts-text">DARK&nbsp;HOUR</span></button>
-    </div>
+    <button class="night-btn" id="night-toggle" type="button" aria-pressed="false" title="夜间模式">
+      <span class="nb-disc" aria-hidden="true"></span>
+      <span class="nb-text">NIGHT</span>
+    </button>
     <button class="menu-btn" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">MENU</button>
   </div>
 </header>

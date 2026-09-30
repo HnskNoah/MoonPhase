@@ -93,7 +93,7 @@ await build({ dev: true })
 server.listen(PORT, () => {
   console.log(`\n  ◉ Dark Hour 已开启`)
   console.log(`  本地预览  http://localhost:${PORT}/`)
-  console.log(`  监听 content/ src/ site.config.mjs，Ctrl+C 退出\n`)
+  console.log(`  监听 content/ 与 src/；改 build/ 或 site.config.mjs 需要重启\n`)
 })
 
 let watching = false
@@ -103,9 +103,15 @@ for (const dir of ['content', 'src']) {
   watching = true
   fs.watch(full, { recursive: true }, (_t, file) => rebuild(file || dir))
 }
-if (fs.existsSync(path.join(ROOT, 'site.config.mjs'))) {
-  watching = true
-  fs.watch(path.join(ROOT, 'site.config.mjs'), () => rebuild('site.config.mjs'))
+// 模板与配置是 ESM，进程内有模块缓存，改了必须重启才能生效
+for (const dir of ['build', '.']) {
+  const full = path.join(ROOT, dir)
+  if (!fs.existsSync(full)) continue
+  fs.watch(full, (_t, file) => {
+    if (!file || !/\.(mjs|js)$/.test(file)) return
+    if (file.startsWith('dev.')) return
+    console.log(`\n! ${file} 变更：模板/构建脚本有模块缓存，请重启 npm run dev`)
+  })
 }
 if (!watching) console.log('! 没有可监听的目录，仅静态服务')
 

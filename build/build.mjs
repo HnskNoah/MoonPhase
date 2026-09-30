@@ -53,7 +53,7 @@ export async function build({ dev = false } = {}) {
   await copyDir(path.join(ROOT, 'public'), DIST)
   await writeOut('.nojekyll', '')
 
-  written.push(await writeOut('index.html', renderHome({ posts, dev })))
+  written.push(await writeOut('index.html', renderHome({ posts, groups, dev })))
   written.push(await writeOut('archive/index.html', renderArchive({ posts, dev })))
   written.push(await writeOut('tags/index.html', renderTagsIndex({ groups, posts, dev })))
   for (const g of groups) {
