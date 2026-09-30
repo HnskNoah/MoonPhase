@@ -232,13 +232,14 @@ img {
 }
 .veil i {
   position: absolute;
+  /* 兜底方案与原生转场同方向：从画面底部中央涨起 */
   left: 50%;
-  top: 50%;
-  width: 150vmax;
-  height: 150vmax;
-  margin: -75vmax 0 0 -75vmax;
+  top: 100%;
+  width: 260vmax;
+  height: 260vmax;
+  margin: -130vmax 0 0 -130vmax;
   border-radius: 50%;
-  /* 下潜：实心深蓝圆盘 + 边缘一圈涟漪，不放照片（方图压在圆上很难看） */
+  /* 下潜：实心深蓝圆盘 + 边缘一圈涟漪 */
   background:
     radial-gradient(circle at 50% 50%, transparent 0 46.6%, var(--veil-ring) 46.6% 47.6%, transparent 47.6%),
     radial-gradient(circle at 50% 38%, var(--veil-hi), transparent 58%),
@@ -251,6 +252,39 @@ body.is-leaving .veil i {
 }
 body.is-entering .veil i {
   transform: scale(0);
+}
+
+/* ---------- 跨文档转场：潮水从底部涨起（View Transitions API） ---------- */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-image-pair(root) {
+    isolation: auto;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+    display: block;
+  }
+  ::view-transition-old(root) {
+    z-index: 1;
+  }
+  ::view-transition-new(root) {
+    z-index: 2;
+    animation: tide-in 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+
+@keyframes tide-in {
+  from {
+    clip-path: circle(0% at 50% 118%);
+  }
+  to {
+    clip-path: circle(240% at 50% 118%);
+  }
 }
 
 /* ---------- 顶栏 ---------- */
@@ -304,12 +338,18 @@ body.is-entering .veil i {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  /* 整层与照片相乘：明暗界线是「照上去的影子」而不是一块黑 */
-  mix-blend-mode: multiply;
-  opacity: 0.72;
 }
+/* 阴影圆单独相乘，界线的高光边才能正常显示（整层 multiply 会把白边吃掉） */
 .hp-shadow {
   fill: var(--eclipse);
+  mix-blend-mode: multiply;
+  transition: transform 0.7s var(--ease);
+}
+.hp-rim {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 0.35;
+  opacity: 0.55;
   transition: transform 0.7s var(--ease);
 }
 

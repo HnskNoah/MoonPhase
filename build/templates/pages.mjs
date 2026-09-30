@@ -14,6 +14,8 @@ function heroPanel() {
     <svg class="hero-phase" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
       <defs><clipPath id="hp-clip"><circle cx="16" cy="16" r="16"/></clipPath></defs>
       <g clip-path="url(#hp-clip)"><circle class="hp-shadow" id="hp-shadow" cx="16" cy="16" r="16"/></g>
+      <!-- 明暗界线的受光边 -->
+      <g clip-path="url(#hp-clip)"><circle class="hp-rim" id="hp-rim" cx="16" cy="16" r="15.7"/></g>
     </svg>
     <span class="hero-frame-edge" aria-hidden="true"></span>
   </div>

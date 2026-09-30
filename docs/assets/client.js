@@ -44,6 +44,7 @@
     for (const [id, d] of [
       ['bm-shadow', 21],
       ['hp-shadow', 32],
+      ['hp-rim', 31.4],
     ]) {
       const el = document.getElementById(id)
       if (el) el.style.transform = `translateX(${((dir * shift) / 100) * d}px)`
@@ -169,9 +170,13 @@
       .forEach((a) => a.addEventListener('click', () => body.classList.remove('nav-open')))
   }
 
-  /* ---------- 水波转场 ---------- */
+  /* ---------- 转场 ---------- */
+  // 支持跨文档 View Transitions 的浏览器由 CSS 的 tide-in 接管，不再手动拦截链接
+  const nativeTide =
+    'startViewTransition' in document && !!(window.CSS && CSS.supports && CSS.supports('view-transition-name: none'))
+
   function initVeil() {
-    if (reduced) return
+    if (reduced || nativeTide) return
     document.querySelectorAll('a[href]').forEach((a) => {
       if (a.target || a.hasAttribute('download')) return
       const href = a.getAttribute('href')

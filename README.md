@@ -78,6 +78,14 @@ draft: false
 
 形状相关的 `--panel-clip` / `--chip-radius` / `--arch-*` / `--flag` 也在 `:root` 里，改轮廓只动这里。
 
+## 跳转动画怎么实现的
+
+优先用浏览器原生的**跨文档 View Transitions**：`src/styles/main.css` 里 `@view-transition { navigation: auto }` 开启，新页面以 `clip-path: circle()` 从画面底部中央涨起（`@keyframes tide-in`，0.62s），旧页面静止垫在下面，所以没有淡入淡出的糊边。
+
+- 需要 Chromium 126+ / Safari 18.2+；`prefers-reduced-motion: reduce` 时整段禁用
+- 检测到手时（`'startViewTransition' in document && CSS.supports('view-transition-name: none')`），`src/client.js` 会**跳过**自己的链接拦截，避免两套动画打架
+- 不支持的浏览器（如 Firefox）回落到 `.veil` 那颗水球：同样从底部中央涨起，颜色走 `--veil-core / --veil-edge / --veil-hi / --veil-ring` 四个令牌，夜间模式自动压暗
+
 ## 部署到 GitHub Pages
 
 仓库名假设是 `blog`。先确认 `site.config.mjs` 里 `base: '/blog/'`（用户站点保持 `/`），然后二选一。
@@ -120,7 +128,7 @@ git push   # .github/workflows/deploy.yml 会 npm ci && npm run build && 发布 
 - 一套 P3R 界面语言 + 夜间模式：右上角 `NIGHT` 切换，记忆在 localStorage，首次访问跟随系统 `prefers-color-scheme`
 - 顶栏 Dark Hour 时钟，走到 0:00 会高亮提示
 - 左侧月相：跟随本地日期计算真实月相与亮度，同时是滚动进度条
-- 页面跳转的圆形水波转场、卡片的硬阴影抬升
+- 页面跳转：潮水从底部涨起的圆形揭示（View Transitions API），不支持的浏览器回落到同方向的 JS 水球
 - 整张卡片可点击（标题链接铺满卡片，标签与 READ 仍可单独点）
 - `prefers-reduced-motion` 降级、`:focus-visible` 可见、打印样式
 
