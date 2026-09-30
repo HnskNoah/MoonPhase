@@ -132,4 +132,8 @@ git push   # .github/workflows/deploy.yml 会 npm ci && npm run build && 发布 
 
 **月相侧栏看不见。** 它在窗口宽度小于 1320px 时隐藏，属于设计决定，不是 bug。
 
+**提交前记得再跑一次 `npm run build`。** `docs/` 是要提交的，而 `npm run dev` 生成的是开发版产物（多一段热刷新脚本）。开发完直接 `npm run build` 覆盖一遍再 commit，别把开发版产物推上去。
+
+**改了模板或 `site.config.mjs` 但页面没变化。** 它们是 ESM，dev 进程内有模块缓存，必须重启 `npm run dev`（改 `content/` 与 `src/` 不用）。
+
 **字体没加载。** 标题用 Google Fonts 上的 Archivo（含斜体）+ Noto Sans SC。访问不了时会回落到系统中文字体，排版会略偏，但仍然可用。要彻底离线就把字体下载进 `src/assets/fonts/` 并改写 `main.css` 顶部的 `--font-*`。

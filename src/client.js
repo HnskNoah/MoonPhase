@@ -73,7 +73,12 @@
 
   function syncNightBtn() {
     const btn = document.getElementById('night-toggle')
-    if (btn) btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'night'))
+    if (!btn) return
+    const night = root.getAttribute('data-theme') === 'night'
+    btn.setAttribute('aria-pressed', String(night))
+    btn.title = night ? '当前：夜间模式' : '当前：浅色模式'
+    const text = btn.querySelector('.nb-text')
+    if (text) text.textContent = night ? 'NIGHT' : 'LIGHT'
   }
 
   function initNight() {

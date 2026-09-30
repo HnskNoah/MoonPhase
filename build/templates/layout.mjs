@@ -102,9 +102,9 @@ ${NIGHT_BOOTSTRAP}${head}
   <nav id="site-nav" class="site-nav" aria-label="主导航">${navItems(active)}</nav>
   <div class="head-tools">
     <time class="dark-clock" id="dark-clock" title="Dark Hour 时钟">--:--</time>
-    <button class="night-btn" id="night-toggle" type="button" aria-pressed="false" title="夜间模式">
+    <button class="night-btn" id="night-toggle" type="button" aria-pressed="false" title="当前：浅色模式">
       <span class="nb-disc" aria-hidden="true"></span>
-      <span class="nb-text">NIGHT</span>
+      <span class="nb-text">LIGHT</span>
     </button>
     <button class="menu-btn" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">MENU</button>
   </div>
