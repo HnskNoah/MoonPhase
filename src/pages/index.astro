@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Hero from '../components/Hero.astro'
+import Feature from '../components/Feature.astro'
+import SectionHead from '../components/SectionHead.astro'
+import PostList from '../components/PostList.astro'
+import { loadPosts, groupByTag } from '../lib/posts'
+import { config } from '../consts'
+
+const posts = await loadPosts()
+const groups = groupByTag(posts)
+const featured = posts.find((p) => p.pinned) ?? posts[0]
+const recent = posts.filter((p) => !p.pinned).slice(0, config.pagination.home)
+---
+
+<Layout bodyClass="page-home" active="/" path="/" postsCount={posts.length}>
+  <Hero posts={posts} groups={groups} />
+
+  <section class="section">
+    <SectionHead latin="HIGHLIGHT" title="重点记录" />
+    <Feature post={featured} />
+  </section>
+
+  <section class="section">
+    <SectionHead latin="RECENT" title="最近的记录" more="全部" />
+    <PostList posts={recent} offset={1} />
+  </section>
+
+  <section class="section quote-block">
+    <p class="quote">“所谓长大，就是开始记住那些终将逝去的东西。”</p>
+    <p class="quote-latin">
+      MEMENTO MORI — 由 <b>{config.author}</b> 记录于深青色的海里
+    </p>
+  </section>
+</Layout>

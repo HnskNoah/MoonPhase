@@ -1,0 +1,106 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import PageHead from '../../components/PageHead.astro'
+import { loadPosts, type Post } from '../../lib/posts'
+import { tocFromHeadings } from '../../lib/headings'
+import { u, fmtDate } from '../../lib/site'
+import { config } from '../../consts'
+import { render } from 'astro:content'
+
+export async function getStaticPaths() {
+  const posts = await loadPosts()
+  return posts.map((p, i) => ({
+    params: { slug: p.slug },
+    props: {
+      post: p,
+      prev: posts[i + 1] ?? null,
+      next: posts[i - 1] ?? null,
+      postsCount: posts.length,
+    },
+  }))
+}
+
+interface Props {
+  post: Post
+  prev: Post | null
+  next: Post | null
+  postsCount: number
+}
+
+const { post, prev, next, postsCount } = Astro.props
+const { Content, headings } = await render(post.entry)
+const toc = tocFromHeadings(headings)
+---
+
+<Layout
+  title={post.title}
+  description={post.description}
+  path={`/posts/${post.slug}/`}
+  active="/archive/"
+  bodyClass="page-post"
+  postsCount={postsCount}
+>
+  <article class="post">
+    <PageHead kicker={post.latin || 'RECORD'} latin={post.latin} title={post.title}>
+      <span slot="meta">
+        <time datetime={post.date.toISOString()}>{fmtDate(post.date)}</time>
+        {post.updated && <span>更新 {fmtDate(post.updated)}</span>}
+        <span class="meta-dot">·</span>
+        <span>{post.minutes} min</span>
+        <span class="meta-dot">·</span>
+        <span>{config.author}</span>
+        {
+          post.tagItems.map((t) => (
+            <a class="chip" href={u(`/tags/${t.key}/`)}>
+              {t.label}
+            </a>
+          ))
+        }
+      </span>
+    </PageHead>
+
+    <div class="post-grid">
+      {
+        toc.length > 1 && (
+          <nav class="toc" aria-label="目录">
+            <p class="toc-head">CONTENTS</p>
+            <ol>
+              {toc.map((t) => (
+                <li class={`lvl-${t.level}`}>
+                  <a href={`#${t.id}`}>{t.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+
+    <div class="post-end">
+      <span class="end-rule"></span>
+      <p class="end-mark">MEMENTO MORI</p>
+    </div>
+
+    <nav class="post-nav">
+      {
+        prev && (
+          <a class="pn pn--prev" href={u(`/posts/${prev.slug}/`)}>
+            <span>PREV</span>
+            <b>{prev.title}</b>
+          </a>
+        )
+      }
+      {
+        next && (
+          <a class="pn pn--next" href={u(`/posts/${next.slug}/`)}>
+            <span>NEXT</span>
+            <b>{next.title}</b>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Layout>

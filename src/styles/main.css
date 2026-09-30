@@ -1431,6 +1431,37 @@ img {
   transition: transform 0.3s;
 }
 
+/* ---------- 分页 ---------- */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+.pager-now {
+  font: 400 12px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  text-align: center;
+}
+.pager-now b {
+  color: var(--red-text);
+  font-weight: 700;
+}
+.pager-now em {
+  display: block;
+  margin-top: 6px;
+  font-style: normal;
+  letter-spacing: 0.2em;
+}
+.btn.is-off {
+  opacity: 0.32;
+  pointer-events: none;
+  box-shadow: none;
+}
+
 /* ---------- 标签墙 ---------- */
 .tag-wall {
   display: grid;
@@ -1606,7 +1637,7 @@ img {
   /* 和首页大图用同一张素材、同一套双色调，两处才对得上 */
   background:
     radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.22), transparent 48%),
-    url('abyss.jpg') 50% 45% / cover no-repeat;
+    url('../assets/abyss.jpg') 50% 45% / cover no-repeat;
   filter: grayscale(1) contrast(1.28) brightness(1.18) sepia(1) hue-rotate(163deg) saturate(3.3);
   box-shadow: 0 40px 120px -40px rgba(11, 28, 61, 0.55);
 }

@@ -1,0 +1,38 @@
+---
+import type { PageInfo } from '../lib/paginate'
+
+interface Props {
+  info: PageInfo
+}
+
+const { info } = Astro.props
+---
+
+{
+  info.pages > 1 && (
+    <nav class="pager" aria-label="分页">
+      {info.prev ? (
+        <a class="btn" href={info.prev}>
+          <i>◂</i> PREV
+        </a>
+      ) : (
+        <span class="btn is-off" aria-hidden="true">
+          <i>◂</i> PREV
+        </span>
+      )}
+      <span class="pager-now">
+        PAGE <b>{String(info.page).padStart(2, '0')}</b> / {String(info.pages).padStart(2, '0')}
+        <em>{info.total} 条</em>
+      </span>
+      {info.next ? (
+        <a class="btn" href={info.next}>
+          NEXT <i>▸</i>
+        </a>
+      ) : (
+        <span class="btn is-off" aria-hidden="true">
+          NEXT <i>▸</i>
+        </span>
+      )}
+    </nav>
+  )
+}

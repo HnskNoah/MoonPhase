@@ -1,0 +1,23 @@
+---
+import type { Post } from '../lib/posts'
+import { u, fmtDate } from '../lib/site'
+
+interface Props {
+  post: Post
+}
+
+const { post } = Astro.props
+---
+
+<a class="feature" href={u(`/posts/${post.slug}/`)}>
+  <span class="feature-idx">{post.latin || 'PHASE'}</span>
+  <span class="feature-main">
+    <b>{post.title}</b>
+    <i>{post.description}</i>
+  </span>
+  <span class="feature-meta">
+    <time datetime={post.date.toISOString()}>{fmtDate(post.date)}</time>
+    <em>{post.minutes} min</em>
+  </span>
+  <span class="feature-go">READ <i>▸</i></span>
+</a>

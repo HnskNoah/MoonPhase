@@ -1,0 +1,51 @@
+---
+import Pager from './Pager.astro'
+import type { Post } from '../lib/posts'
+import type { PageInfo } from '../lib/paginate'
+import { u, fmtDate } from '../lib/site'
+
+interface Props {
+  posts: Post[]
+  info: PageInfo
+}
+
+const { posts, info } = Astro.props
+
+/** 页内按年分组：翻页时年份可能被切断，但每组自带年份标题，不会读错 */
+const groups: { year: number; posts: Post[] }[] = []
+for (const p of posts) {
+  const y = p.date.getFullYear()
+  const last = groups[groups.length - 1]
+  if (!last || last.year !== y) groups.push({ year: y, posts: [p] })
+  else last.posts.push(p)
+}
+---
+
+<div class="archive">
+  {
+    groups.map((g) => (
+      <section class="arch-year">
+        <h2 class="arch-year-title">
+          <span>{g.year}</span>
+          <em>{g.posts.length} records</em>
+        </h2>
+        <ul class="arch-list">
+          {g.posts.map((p, i) => (
+            <li style={`--i:${i}`}>
+              <a href={u(`/posts/${p.slug}/`)}>
+                <time>{fmtDate(p.date)}</time>
+                <b>{p.title}</b>
+                <span class="arch-tags">{p.tagItems.map((t) => t.label).join(' / ')}</span>
+                <span class="arch-go">
+                  <i>▸</i>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</div>
+
+<Pager info={info} />

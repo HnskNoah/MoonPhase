@@ -1,0 +1,50 @@
+---
+import Layout from '../../../layouts/Layout.astro'
+import PageHead from '../../../components/PageHead.astro'
+import PostList from '../../../components/PostList.astro'
+import Pager from '../../../components/Pager.astro'
+import { loadPosts, groupByTag, type TagGroup } from '../../../lib/posts'
+import { paginate, type PageInfo } from '../../../lib/paginate'
+import { u } from '../../../lib/site'
+import { config } from '../../../consts'
+
+interface Props {
+  group: TagGroup
+  info: PageInfo
+  totalPosts: number
+}
+
+export async function getStaticPaths() {
+  const posts = await loadPosts()
+  return groupByTag(posts).map((group) => ({
+    params: { tag: group.key },
+    props: {
+      group,
+      info: paginate(group.posts, 1, config.pagination.tag, (n) => tagUrl(group.key, n)).info,
+      totalPosts: posts.length,
+    },
+  }))
+}
+
+function tagUrl(key: string, n: number): string {
+  return n === 1 ? u(`/tags/${key}/`) : u(`/tags/${key}/${n}/`)
+}
+
+const { group, info, totalPosts } = Astro.props
+---
+
+<Layout
+  title={`标签：${group.label}`}
+  description={`${config.title} 中标签「${group.label}」下的记录`}
+  path={`/tags/${group.key}/`}
+  active="/tags/"
+  bodyClass="page-tag"
+  postsCount={totalPosts}
+>
+  <PageHead kicker={`TAG / ${group.key}`} title={group.label} lead={`共 ${group.posts.length} 条记录`} />
+  <PostList posts={group.posts.slice((info.page - 1) * info.size, info.page * info.size)} />
+  <Pager info={info} />
+  <p class="back-line">
+    <a href={u('/tags/')}>← 回到标签墙</a>
+  </p>
+</Layout>

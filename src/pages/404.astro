@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { u } from '../lib/site'
+---
+
+<Layout title="404" path="/404.html" bodyClass="page-404">
+  <section class="nf">
+    <p class="nf-code">404</p>
+    <h1 class="nf-title">
+      <span>这个页面</span>
+      <b>还没有浮出水面</b>
+    </h1>
+    <p class="nf-desc">你走入了不存在的走廊。回去比较安全。</p>
+    <a class="btn btn--solid" href={u('/')}>回到首页 <i>▸</i></a>
+  </section>
+</Layout>

@@ -1,0 +1,36 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import PageHead from '../../components/PageHead.astro'
+import { loadPosts, groupByTag } from '../../lib/posts'
+import { u } from '../../lib/site'
+import { config } from '../../consts'
+
+const posts = await loadPosts()
+const groups = groupByTag(posts)
+---
+
+<Layout
+  title="标签"
+  description="按标签浏览全部记录"
+  path="/tags/"
+  active="/tags/"
+  bodyClass="page-tags"
+  postsCount={posts.length}
+>
+  <PageHead kicker="TAROT" title="标签" lead="每一条记录都属于某个牌组。" />
+  <div class="tag-wall">
+    {
+      groups.map((g, i) => (
+        <a class="tag-card" style={`--i:${i}`} href={u(`/tags/${g.key}/`)}>
+          <span class="tc-num">{String(i + 1).padStart(2, '0')}</span>
+          <span class="tc-label">{g.label}</span>
+          <span class="tc-key">{g.key}</span>
+          <span class="tc-count">{g.posts.length}</span>
+        </a>
+      ))
+    }
+  </div>
+  <p class="back-line">
+    <a href={u('/archive/')}>← 回到按时间的归档</a>
+  </p>
+</Layout>

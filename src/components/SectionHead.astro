@@ -1,0 +1,26 @@
+---
+import { u } from '../lib/site'
+
+interface Props {
+  latin: string
+  title: string
+  more?: string
+}
+
+const { latin, title, more = '' } = Astro.props
+---
+
+<header class="section-head">
+  <h2 class="section-title">
+    <span class="st-latin">{latin}</span>
+    <span class="st-main">{title}</span>
+  </h2>
+  <span class="section-rule"></span>
+  {
+    more && (
+      <a class="section-more" href={u('/archive/')}>
+        {more} <i>▸</i>
+      </a>
+    )
+  }
+</header>

@@ -1,0 +1,42 @@
+---
+import type { Post } from '../lib/posts'
+import { u, fmtDateLatin, roman } from '../lib/site'
+
+interface Props {
+  post: Post
+  index: number
+}
+
+const { post, index } = Astro.props
+const href = u(`/posts/${post.slug}/`)
+const sub = post.latin || post.tagItems.map((t) => t.label).join(' / ') || 'RECORD'
+---
+
+<article class="card card--row" style={`--i:${index}`}>
+  <div class="card-side">
+    <span class="card-roman" aria-hidden="true">{roman(index + 1)}</span>
+    <span class="card-num">{String(index + 1).padStart(2, '0')}</span>
+    <time class="card-date" datetime={post.date.toISOString().slice(0, 10)}>{fmtDateLatin(post.date)}</time>
+    <span class="card-sub">{sub}</span>
+  </div>
+  <div class="card-body">
+    <h2 class="card-title">
+      <a href={href}>{post.title}</a>
+    </h2>
+    {post.latin && <p class="card-latin">{post.latin}</p>}
+    <p class="card-desc">{post.description}</p>
+    <div class="card-foot">
+      <span class="card-tags">
+        {
+          post.tagItems.map((t) => (
+            <a class="chip" href={u(`/tags/${t.key}/`)}>
+              {t.label}
+            </a>
+          ))
+        }
+      </span>
+      <span class="card-meta">{post.minutes} min</span>
+      <a class="card-more" href={href}>READ <i>▸</i></a>
+    </div>
+  </div>
+</article>

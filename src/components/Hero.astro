@@ -1,0 +1,85 @@
+---
+import { Image } from 'astro:assets'
+import abyss from '../assets/abyss.jpg'
+import type { Post, TagGroup } from '../lib/posts'
+import { config } from '../consts'
+import { u } from '../lib/site'
+
+interface Props {
+  posts: Post[]
+  groups: TagGroup[]
+}
+
+const { posts, groups } = Astro.props
+const latest = posts[0]
+const tags = groups.slice(0, 6)
+---
+
+<section class="hero">
+  <div class="hero-text">
+    <p class="kicker"><span class="kicker-tick"></span>0:00 &nbsp;/&nbsp; AFTER SCHOOL HOURS</p>
+    <h1 class="hero-title">
+      <span class="hero-title-latin">{config.latinTitle}</span>
+      <span class="hero-title-main">{config.title}</span>
+    </h1>
+    <p class="hero-sub">{config.subtitle}</p>
+    <p class="hero-desc">{config.description}</p>
+    <div class="hero-cta">
+      <a class="btn btn--solid" href={u('/archive/')}>进入归档 <i>▸</i></a>
+      <a class="btn" href={u(`/posts/${latest.slug}/`)}>读最新一条 <i>▸</i></a>
+    </div>
+    <ul class="hero-tags">
+      {
+        tags.map((t, i) => (
+          <li style={`--i:${i}`}>
+            <a href={u(`/tags/${t.key}/`)}>{t.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="hero-panel">
+    <div class="hero-frame">
+      <Image
+        class="hero-img"
+        src={abyss}
+        alt="深海与月光的抽象背景"
+        widths={[480, 720, 1000]}
+        sizes="(max-width: 900px) 92vw, 520px"
+        loading="eager"
+        decoding="async"
+      />
+      <!-- 月相遮罩叠在照片上：multiply 混合，像明暗界线而不是一块黑 -->
+      <svg class="hero-phase" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <defs>
+          <clipPath id="hp-clip">
+            <circle cx="16" cy="16" r="16"></circle>
+          </clipPath>
+        </defs>
+        <g clip-path="url(#hp-clip)">
+          <circle class="hp-shadow" id="hp-shadow" cx="16" cy="16" r="16"></circle>
+        </g>
+        <g clip-path="url(#hp-clip)">
+          <circle class="hp-rim" id="hp-rim" cx="16" cy="16" r="15.7"></circle>
+        </g>
+      </svg>
+      <span class="hero-frame-edge" aria-hidden="true"></span>
+    </div>
+    <dl class="hero-stats">
+      <div>
+        <dt>PHASE</dt>
+        <dd class="moon-name">—</dd>
+      </div>
+      <div>
+        <dt>DATE</dt>
+        <dd class="stat-date">—</dd>
+      </div>
+      <div>
+        <dt>RECORDS</dt>
+        <dd class="stat-count">—</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+<div class="tide" aria-hidden="true"><span></span></div>

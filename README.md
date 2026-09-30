@@ -1,47 +1,44 @@
-# 月相记录 · Persona 3 风格个人博客
+# 月相记录 · 女神异闻录3 风格个人博客
 
-一个纯静态的个人博客，视觉语言取自《女神异闻录3》与其重制版：蓝色与水、水下浮游的焦散光、斜切面板、月相进度，以及 MEMENTO MORI。
-
-产物全部落在 `docs/`，可以直接作为 GitHub Pages 的发布目录；也附带一个 GitHub Actions 工作流做自动构建。
+Astro 5 + TypeScript 写的静态博客，视觉语言取自《女神异闻录3 Reload》的菜单界面：白纸面、钴蓝圆碟、撕纸旗标、巨型斜体重型字、硬阴影纸牌，以及那句反复出现的 MEMENTO MORI。产物是纯静态文件，部署在 GitHub Pages。
 
 ## 先看哪条命令
 
 ```bash
-npm install     # 装依赖（marked + gray-matter）
-npm run dev     # 本地开发 http://localhost:4321，改 md/css/js 自动重建并刷新
-npm run build   # 生成 docs/
+npm install     # 装依赖
+npm run dev     # 本地开发 http://localhost:4321，带热更新
+npm run build   # 生成 dist/
+npm run preview # 预览构建产物
 ```
 
 ## 目录
 
 ```text
-content/posts/*.md   文章（frontmatter + Markdown）
-content/pages/*.md   独立页面（关于等）
-src/styles/main.css  全部样式与两套主题令牌
-src/client.js        月相 / 阅读进度 / Dark Hour 时钟 / 夜间模式 / 移动菜单
-src/assets/          图片、图标
-build/               构建脚本与模板
-site.config.mjs      站点信息、导航、标签映射
-docs/                构建产物 = 站点全部内容
+src/content/posts/*.md   文章（frontmatter + Markdown）
+src/content/pages/*.md   独立页面（关于等）
+src/content.config.ts    内容集合与 zod 校验（字段写错会构建失败，不会静默兜底）
+src/consts.ts            站点信息、导航、标签映射、分页大小
+src/lib/                 日期 / slug / 罗马数字 / 阅读时长 / 分页 / 标题锚点
+src/layouts/Layout.astro 全站外壳（head、顶栏、月相轨、页脚）
+src/components/          Hero / PostCard / PageHead / ArchiveBody / Pager 等
+src/pages/               路由：首页、文章、归档（分页）、标签（分页）、关于、404、rss、robots
+src/styles/main.css      全部样式与主题令牌
+src/scripts/client.ts    月相 / 进度 / 时钟 / 夜间模式 / 目录高亮 / 移动菜单
+src/assets/              需要进图片管线的素材（头图）
+public/                  原样拷贝的资源（favicon、.nojekyll）
+astro.config.ts          site / base / 集成 / markdown 插件
 ```
 
 ## 改这些就能变成你自己的站
 
-1. `site.config.mjs`：`title` / `latinTitle` / `subtitle` / `author` / `description` / `base` / `theme` / `nav` / `social`；
-2. `content/pages/about.md`：自我介绍；
-3. `src/assets/favicon.svg`：换成你自己的标识；
-4. 删掉 `content/posts/` 里的示例文章。
-
-`base` 的取值规则：
-
-| 站点类型 | 仓库名 | base |
-| --- | --- | --- |
-| 用户站点 | `<user>.github.io` | `/` |
-| 项目站点 | `<user>.github.io/blog` | `/blog/` |
+1. `src/consts.ts`：`title` / `latinTitle` / `subtitle` / `author` / `description` / `nav` / `social` / `tagKeys` / `pagination`
+2. `src/content/pages/about.md`：自我介绍
+3. `public/assets/favicon.svg`：换成你自己的标识
+4. 删掉 `src/content/posts/` 里的示例文章
 
 ## 加一篇文章
 
-在 `content/posts/` 新建 `2026-10-01-hello.md`：
+在 `src/content/posts/` 新建 `2026-10-01-hello.md`：
 
 ```markdown
 ---
@@ -57,16 +54,30 @@ draft: false
 正文……
 ```
 
-- `slug` 默认取文件名（去掉扩展名），也可以用 frontmatter 的 `slug` 覆盖；
-- 站内链接写绝对路径（`/posts/xxx/`、`/feed.xml`），构建时会自动补上 `base` 前缀；
-- `{{author}}` `{{title}}` `{{year}}` 会在正文里被替换成站点配置的值；
-- 标签名如果不在 `site.config.mjs` 的 `tagKeys` 里，会用 slug 结果当目录名。
+- URL 用文件名（去掉扩展名），也可以用 frontmatter 的 `slug` 覆盖
+- 字段名写错、日期格式不对，构建时会直接报错并指出文件（这是换 Astro 的主要收益之一）
+- 站内链接写绝对路径（`/posts/xxx/`），Astro 会自动补 base 前缀
+- `{{author}}` `{{title}}` `{{year}}` 这类替换目前没有做，需要的话在 `src/lib/` 加个 remark 插件
+
+## 部署到 GitHub Pages
+
+仓库名假设是 `blog`。推送源码，然后 **Settings → Pages → Build and deployment → Source: GitHub Actions**。
+
+之后每次 `git push` 到 `main`，`.github/workflows/deploy.yml` 会 `npm ci && npm run build`，把 `dist/` 作为 Pages 产物发布，并用仓库名自动推导 `BASE_PATH`（用户站点把它改成 `/`）。十几秒后可访问 `https://<user>.github.io/blog/`。
+
+`dist/` 不进仓库（已在 `.gitignore`），所以不会出现「几百个 HTML 淹没 diff」的问题。`public/.nojekyll` 仍然保留，万一你想改成分支发布也不会被 Jekyll 拦。
+
+本地构建项目站点：
+
+```bash
+BASE_PATH=/blog SITE_ORIGIN=https://<user>.github.io npm run build
+```
 
 ## 配色：一套 P3R + 夜间模式
 
-全站只有一套界面语言（P3R 的白纸面 / 钴蓝圆碟 / 撕纸旗标 / 巨型斜体字 / 硬阴影纸牌），右上角的 `NIGHT` 按钮切到夜间模式，选择记在 localStorage，首次访问跟随系统的 `prefers-color-scheme`。
+全站只有一套界面语言，右上角 `NIGHT` 按钮切夜间；选择记在 localStorage，首次访问跟随系统 `prefers-color-scheme`，`<head>` 里有一段内联脚本在绘制前落主题，避免闪白。
 
-夜间模式不重写组件样式，只翻转令牌，所以新加组件时**不要写死颜色**，用这几个：
+夜间模式只翻令牌，不重写组件，所以新加样式时**不要写死颜色**：
 
 | 令牌 | 含义 | 浅色 | 夜间 |
 | --- | --- | --- | --- |
@@ -75,65 +86,34 @@ draft: false
 | `--shadow-hard` / `--shadow-hover` | 硬阴影 | 蓝灰 | 黑 / 青 |
 | `--band` / `--band-ink` | 页脚黑带 | 黑底白字 | 更深底 |
 | `--ghost` | 巨型编号水印 | 淡黑 | 淡白 |
+| `--eclipse` | 月相食用阴影 | `#0b1c33` | `#04070a` |
+| `--ink-link` / `--red-text` | 纸面上的强调文字 | 深蓝 / 深红 | 提亮版 |
 
-形状相关的 `--panel-clip` / `--chip-radius` / `--arch-*` / `--flag` 也在 `:root` 里，改轮廓只动这里。
-
-## 部署到 GitHub Pages
-
-仓库名假设是 `blog`。先确认 `site.config.mjs` 里 `base: '/blog/'`（用户站点保持 `/`），然后二选一。
-
-### 方式 A：分支发布（最简单，不需要 CI）
-
-```bash
-npm run build
-git add -A && git commit -m "site: 月相记录"
-git push
-```
-
-GitHub 仓库 → **Settings → Pages → Build and deployment**：
-
-- Source: **Deploy from a branch**
-- Branch: `main` / **`/(docs)`** → Save
-
-十几秒后访问 `https://<user>.github.io/blog/`。`docs/` 里已经带好 `.nojekyll`，Jekyll 不会干扰构建产物。
-
-> 这个方式要求 `docs/` 被提交进仓库。仓库里 `.gitignore` 没有忽略它，保持现状即可。
-
-### 方式 B：GitHub Actions 自动构建
-
-同样的 Pages 设置里把 Source 改成 **GitHub Actions**，然后只推送源码：
-
-```bash
-git add -A && git commit -m "posts: 新文章"
-git push   # .github/workflows/deploy.yml 会 npm ci && npm run build && 发布 docs/
-```
-
-工作流已经用 `github.event.repository.name` 自动推导 `BASE_PATH`，本地 `site.config.mjs` 的 `base` 不影响 CI。走这条路可以把 `docs/` 加进 `.gitignore`，也可以直接删掉 `.github/` 回到方式 A。
+形状令牌（`--flag`、`--panel-clip`、`--chip-radius` 等）也在 `:root`，改轮廓只动那里。
 
 ## 已实现的东西
 
 - 首页（Hero + 重点记录 + 最近五条 + 引言块）
-- 文章页：目录侧栏、滚动高亮、上一篇/下一篇、阅读时长
-- 归档页（按年分组）、标签墙、标签页
+- 文章页：目录侧栏、滚动高亮、上一篇/下一篇、阅读时长、标题锚点
+- 归档页按年分组并**分页**（默认每页 30），标签墙与标签页同样分页（每页 20）
 - 关于页、404 页
-- RSS (`/feed.xml`) 与 sitemap、robots
-- 一套 P3R 界面语言 + 夜间模式：右上角 `NIGHT` 切换，记忆在 localStorage，首次访问跟随系统 `prefers-color-scheme`
+- RSS (`/rss.xml`)、`sitemap-index.xml`、robots
+- 图片管线：头图由 `astro:assets` 自动出 3 档 WebP（90KB 原图 → 5/9/15/37KB）并写进 `srcset`
+- 夜间模式（见上）
 - 顶栏 Dark Hour 时钟，走到 0:00 会高亮提示
-- 左侧月相：跟随本地日期计算真实月相与亮度，同时是滚动进度条
+- 左侧月相：按本地日期算真实月相与亮度，同时是滚动进度条；左上角徽标与首页圆框里的月相遮罩共用同一个计算
 - 整张卡片可点击（标题链接铺满卡片，标签与 READ 仍可单独点）
-- 页面跳转不做自定义转场：走浏览器原生导航（旧页面保持绘制到新页面就绪后一次性替换），少一层跨浏览器不一致
+- 页面跳转不做自定义转场：走浏览器原生导航，少一层跨浏览器不一致
 - `prefers-reduced-motion` 降级、`:focus-visible` 可见、打印样式
 
 ## 常见问题
 
-**样式和图片全 404。** `base` 没配对。项目站要写 `/仓库名/`，注意首尾都要斜杠。
+**样式和图片全 404。** base 没配对。项目站点要传 `BASE_PATH=/仓库名`，用户站点留空。
 
-**本地 dev 打不开。** 端口默认 4321，被占用了用 `PORT=5000 npm run dev`。
+**本地 dev 打不开。** 端口默认 4321，被占用用 `PORT=5000 npx astro dev --port 5000`。
 
-**月相侧栏看不见。** 它在窗口宽度小于 1320px 时隐藏，属于设计决定，不是 bug。
+**月相侧栏看不见。** 窗口宽度小于 1320px 时隐藏，属于设计决定。
 
-**提交前记得再跑一次 `npm run build`。** `docs/` 是要提交的，而 `npm run dev` 生成的是开发版产物（多一段热刷新脚本）。开发完直接 `npm run build` 覆盖一遍再 commit，别把开发版产物推上去。
+**代码块没有语法高亮。** 故意的：`astro.config.ts` 里把 Shiki 的 `defaultLang` 设成 `text`。因为 Shiki 的双主题走 `prefers-color-scheme`，不跟我们的夜间开关；要高亮的话改成配 `themes: { light, dark }` 并接受系统偏好联动。
 
-**改了模板或 `site.config.mjs` 但页面没变化。** 它们是 ESM，dev 进程内有模块缓存，必须重启 `npm run dev`（改 `content/` 与 `src/` 不用）。
-
-**字体没加载。** 标题用 Google Fonts 上的 Archivo（含斜体）+ Noto Sans SC。访问不了时会回落到系统中文字体，排版会略偏，但仍然可用。要彻底离线就把字体下载进 `src/assets/fonts/` 并改写 `main.css` 顶部的 `--font-*`。
+**字体没加载。** 标题用 Google Fonts 的 Archivo（含斜体）+ Noto Sans SC。访问不了会回落到系统中文字体，排版略偏但仍可用。彻底离线就把字体下载进 `src/assets/fonts/` 并改 `main.css` 顶部的 `--font-*`。

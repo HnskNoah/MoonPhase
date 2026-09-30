@@ -1,0 +1,58 @@
+---
+import Layout from '../layouts/Layout.astro'
+import PageHead from '../components/PageHead.astro'
+import { getCollection, render } from 'astro:content'
+import { tocFromHeadings } from '../lib/headings'
+import { fmtDate } from '../lib/site'
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages')
+  return pages.map((p) => ({
+    params: { slug: p.data.slug },
+    props: { page: p },
+  }))
+}
+
+const { page } = Astro.props
+const { Content, headings } = await render(page)
+const toc = tocFromHeadings(headings)
+---
+
+<Layout
+  title={page.data.title}
+  description={page.data.description}
+  path={`/${page.data.slug}/`}
+  active={`/${page.data.slug}/`}
+  bodyClass="page-static"
+>
+  <article class="post">
+    <PageHead kicker={page.data.latin} latin={page.data.latin} title={page.data.title}>
+      {
+        page.data.date && (
+          <span slot="meta">
+            <time datetime={page.data.date.toISOString()}>{fmtDate(page.data.date)}</time>
+          </span>
+        )
+      }
+    </PageHead>
+    <div class="post-grid">
+      {
+        toc.length > 1 && (
+          <nav class="toc" aria-label="目录">
+            <p class="toc-head">CONTENTS</p>
+            <ol>
+              {toc.map((t) => (
+                <li class={`lvl-${t.level}`}>
+                  <a href={`#${t.id}`}>{t.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</Layout>

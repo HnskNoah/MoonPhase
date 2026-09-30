@@ -1,0 +1,25 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import PageHead from '../../components/PageHead.astro'
+import ArchiveBody from '../../components/ArchiveBody.astro'
+import { loadPosts } from '../../lib/posts'
+import { paginate } from '../../lib/paginate'
+import { config } from '../../consts'
+import { u } from '../../lib/site'
+
+const posts = await loadPosts()
+const size = config.pagination.archive
+const { slice, info } = paginate(posts, 1, size, (n) => (n === 1 ? u('/archive/') : u(`/archive/${n}/`)))
+---
+
+<Layout
+  title="归档"
+  description={`${config.title} 的全部文章归档`}
+  path="/archive/"
+  active="/archive/"
+  bodyClass="page-archive"
+  postsCount={posts.length}
+>
+  <PageHead kicker="ARCHIVE" title="全部记录" lead={`${posts.length} 条记录，按时间倒序沉在水底。每页 ${size} 条。`} />
+  <ArchiveBody posts={slice} info={info} />
+</Layout>

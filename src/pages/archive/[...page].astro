@@ -1,0 +1,41 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import PageHead from '../../components/PageHead.astro'
+import ArchiveBody from '../../components/ArchiveBody.astro'
+import { loadPosts, type Post } from '../../lib/posts'
+import { paginate, type PageInfo } from '../../lib/paginate'
+import { config } from '../../consts'
+import { u } from '../../lib/site'
+
+interface Props {
+  posts: Post[]
+  info: PageInfo
+  total: number
+}
+
+export async function getStaticPaths() {
+  const posts = await loadPosts()
+  const size = config.pagination.archive
+  const pages = Math.max(1, Math.ceil(posts.length / size))
+  const paths: { params: { page: string }; props: Props }[] = []
+  for (let n = 2; n <= pages; n++) {
+    const { slice, info } = paginate(posts, n, size, (k) => (k === 1 ? u('/archive/') : u(`/archive/${k}/`)))
+    paths.push({ params: { page: String(n) }, props: { posts: slice, info, total: posts.length } })
+  }
+  return paths
+}
+
+const { posts, info, total } = Astro.props
+---
+
+<Layout
+  title={`归档 · 第 ${info.page} 页`}
+  description={`${config.title} 文章归档第 ${info.page} 页`}
+  path={`/archive/${info.page}/`}
+  active="/archive/"
+  bodyClass="page-archive"
+  postsCount={total}
+>
+  <PageHead kicker="ARCHIVE" title="全部记录" lead={`第 ${info.page} / ${info.pages} 页，共 ${total} 条。`} />
+  <ArchiveBody posts={posts} info={info} />
+</Layout>

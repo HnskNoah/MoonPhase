@@ -1,5 +1,5 @@
 node_modules/
 dist/
+.astro/
 .DS_Store
 *.log
-vibe_images/
