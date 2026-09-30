@@ -7,6 +7,8 @@
 :root {
   /* 撕纸旗标：P3R 的选中态形状 */
   --flag: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+  /* 内缩 2px 后的同一形状，用来做描边 */
+  --flag-inner: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
   --chip-clip: none;
   --chip-radius: 999px;
   --panel-clip: none;
@@ -1728,14 +1730,16 @@ body.page-home .sea::after {
 .nav-item:hover .nav-label {
   color: var(--ink);
 }
-/* 选中态 = 不透明旗标底 + 红字 + 红描边（填充必须不透明，否则四层 drop-shadow 会糊成一块） */
+/* 选中态 = 红描边旗标：外层整块涂红，内层内缩 2px 再裁一次同样的旗形。
+   用轴向 drop-shadow 叠不出斜切边的描边，只会在 45° 角上断开。 */
+.nav-item.is-on {
+  background: var(--red);
+}
 .nav-item.is-on::before {
+  inset: 2px;
+  clip-path: var(--flag-inner);
   background: var(--flag-bg);
   opacity: 1;
-}
-.nav-item.is-on {
-  filter: drop-shadow(2px 0 0 var(--red)) drop-shadow(-2px 0 0 var(--red)) drop-shadow(0 2px 0 var(--red))
-    drop-shadow(0 -2px 0 var(--red));
 }
 .nav-item.is-on .nav-label {
   color: var(--flag-ink);
@@ -2380,6 +2384,12 @@ body.page-home .sea::after {
     filter: none;
     background: var(--flag-bg);
     box-shadow: inset 6px 0 0 var(--red);
+  }
+  /* 抽屉里是整行高亮，不需要旗形描边 */
+  .nav-item.is-on::before {
+    inset: 0;
+    clip-path: none;
+    background: transparent;
   }
   .nav-item.is-on .nav-label {
     color: var(--flag-ink);
