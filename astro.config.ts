@@ -19,7 +19,7 @@ function resolveBase(): string {
 
 export default defineConfig({
   // 用户站点：<user>.github.io；项目站点：<user>.github.io/仓库名
-  site: process.env.SITE_ORIGIN || 'https://example.github.io',
+  site: process.env.SITE_ORIGIN || 'https://hnsknoah.github.io',
   base: resolveBase(),
   output: 'static',
   trailingSlash: 'always',

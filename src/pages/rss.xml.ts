@@ -8,7 +8,7 @@ export async function GET(context: APIContext) {
   return rss({
     title: config.title,
     description: config.description,
-    site: context.site ?? new URL('https://example.github.io'),
+    site: context.site ?? new URL('https://hnsknoah.github.io'),
     items: posts.slice(0, config.feedLimit).map((p) => ({
       title: p.title,
       description: p.description,

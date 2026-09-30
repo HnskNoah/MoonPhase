@@ -4,7 +4,7 @@ export const config = {
   latinTitle: 'MOON PHASE',
   subtitle: '深青之海里的个人博客',
   description: '一个女神异闻录3风格的个人博客：技术、设计与生活记录。在 0:00 之后，把想法沉入水底再看清一次。',
-  author: '你的代号',
+  author: 'HnskNoah',
   locale: 'zh-CN',
   nav: [
     { label: '首页', latin: 'PHASE', href: '/' },
@@ -13,7 +13,7 @@ export const config = {
     { label: '关于', latin: 'ABOUT', href: '/about/' },
   ],
   social: [
-    { label: 'GITHUB', url: 'https://github.com/your-name' },
+    { label: 'GITHUB', url: 'https://github.com/HnskNoah' },
     { label: 'RSS', url: '/rss.xml' },
   ],
   /** 中文标签 -> URL 里用的 ASCII key；没登记的标签走 slugify */
