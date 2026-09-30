@@ -104,7 +104,6 @@ ${NIGHT_BOOTSTRAP}${head}
       <circle class="bm-ring" cx="16" cy="16" r="14.6"/>
       <circle class="bm-disc" cx="16" cy="16" r="10.5" fill="url(#bm-sky)"/>
       <g clip-path="url(#bm-clip)"><circle class="bm-shadow" id="bm-shadow" cx="16" cy="16" r="10.5"/></g>
-      <path class="bm-ripple" d="M6.5 28.4c2.6-1.4 4.6.9 7-.4"/>
     </svg>
     <span class="brand-text">
       <b>${escapeHtml(config.latinTitle)}</b>

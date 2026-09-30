@@ -298,12 +298,18 @@ body.is-entering .veil i {
   fill: var(--eclipse);
   transition: transform 0.7s var(--ease);
 }
-.bm-ripple {
-  fill: none;
-  stroke: var(--accent-2);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  opacity: 0.9;
+.hero-moon .hm-stop-a {
+  stop-color: #ffffff;
+}
+.hero-moon .hm-stop-b {
+  stop-color: var(--cyan);
+}
+.hero-moon .hm-stop-c {
+  stop-color: var(--cobalt);
+}
+.hero-moon .hm-shadow {
+  fill: var(--eclipse);
+  transition: transform 0.7s var(--ease);
 }
 
 .brand-text {
@@ -757,22 +763,10 @@ body.is-entering .veil i {
   aspect-ratio: 16 / 11;
   box-shadow: 0 30px 70px -30px #000;
 }
-.hero-img {
+.hero-moon {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  filter: saturate(1.05) contrast(1.05);
-  transform: scale(1.04);
-  animation: sink 24s ease-in-out infinite alternate;
-}
-.hero-frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(0deg, var(--bg-0) 2%, transparent 55%),
-    repeating-linear-gradient(0deg, transparent 0 3px, rgba(0, 0, 0, 0.16) 3px 4px);
-  pointer-events: none;
 }
 .hero-frame-edge {
   position: absolute;
@@ -805,14 +799,6 @@ body.is-entering .veil i {
   color: var(--accent);
 }
 
-@keyframes sink {
-  from {
-    transform: scale(1.04) translateY(-1%);
-  }
-  to {
-    transform: scale(1.12) translateY(2%);
-  }
-}
 @keyframes rise {
   from {
     opacity: 0;
@@ -1817,17 +1803,13 @@ body.is-entering .veil i {
   clip-path: none;
   box-shadow: 16px 16px 0 var(--shadow-hard);
 }
-.hero-img {
-  /* 把照片压成 P3R 的蓝白双色调 */
-  filter: grayscale(1) contrast(1.3) brightness(1.3) sepia(1) hue-rotate(163deg) saturate(3.4);
-  animation: none;
-  transform: scale(1.02);
-}
 .hero-frame::after {
-  background:
-    linear-gradient(0deg, rgba(18, 44, 104, 0.42) 0%, transparent 52%),
-    radial-gradient(circle at 1px 1px, rgba(10, 18, 28, 0.28) 1px, transparent 1.4px) 0 0 / 7px 7px;
-  opacity: 0.34;
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 1px 1px, rgba(10, 18, 28, 0.3) 1px, transparent 1.4px) 0 0 / 7px 7px;
+  opacity: 0.22;
 }
 .hero-frame-edge {
   display: none;
@@ -2266,9 +2248,6 @@ body.is-entering .veil i {
 }
 [data-theme='night'] .site-head {
   background: rgba(5, 13, 24, 0.9);
-}
-[data-theme='night'] .hero-img {
-  filter: grayscale(1) contrast(1.22) brightness(0.82) sepia(1) hue-rotate(163deg) saturate(3.8);
 }
 /* 夜里的背景圆盘压暗，别和正文抢注意力 */
 [data-theme='night'] .sea::after {

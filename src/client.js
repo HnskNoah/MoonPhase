@@ -40,9 +40,14 @@
     const shadow = document.querySelector('.moon-shadow')
     if (shadow) shadow.style.transform = `translateX(${dir * shift}%)`
 
-    // 品牌徽标共用同一个相位：位移按 SVG 用户单位换算（盘面直径 21）
-    const bm = document.getElementById('bm-shadow')
-    if (bm) bm.style.transform = `translateX(${((dir * shift) / 100) * 21}px)`
+    // 品牌徽标与首页圆框共用同一个相位：位移按 SVG 用户单位换算（各自盘面直径）
+    for (const [id, d] of [
+      ['bm-shadow', 21],
+      ['hm-shadow', 32],
+    ]) {
+      const el = document.getElementById(id)
+      if (el) el.style.transform = `translateX(${((dir * shift) / 100) * d}px)`
+    }
 
     const nameEl = document.querySelector('.moon-name')
     if (nameEl) nameEl.textContent = `${m.name} · ${m.illum}%`
