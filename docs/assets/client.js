@@ -162,17 +162,18 @@
     })
   }
 
-  /* ---------- 主题：深渊 / Dark Hour ---------- */
+  /* ---------- 主题：RELOAD / ABYSS / DARK HOUR ---------- */
   const THEME_KEY = 'p3-theme'
-  const btn = document.getElementById('theme-toggle')
+  const switcher = document.getElementById('theme-switch')
 
   function applyTheme(theme, persist) {
     root.setAttribute('data-theme', theme)
-    if (btn) {
-      const on = theme === 'darkhour'
-      btn.setAttribute('aria-pressed', String(on))
-      const key = btn.querySelector('.theme-btn-key')
-      if (key) key.textContent = on ? 'DAYLIGHT' : 'DARK\u00a0HOUR'
+    if (switcher) {
+      switcher.querySelectorAll('[data-set-theme]').forEach((b) => {
+        const on = b.dataset.setTheme === theme
+        b.classList.toggle('is-on', on)
+        b.setAttribute('aria-pressed', String(on))
+      })
     }
     if (persist) {
       try {
@@ -191,10 +192,11 @@
     } catch {
       /* noop */
     }
-    applyTheme(saved || root.getAttribute('data-theme') || 'abyss', false)
-    if (btn)
-      btn.addEventListener('click', () => {
-        applyTheme(root.getAttribute('data-theme') === 'darkhour' ? 'abyss' : 'darkhour', true)
+    applyTheme(saved || root.getAttribute('data-theme') || 'reload', false)
+    if (switcher)
+      switcher.addEventListener('click', (ev) => {
+        const b = ev.target.closest('[data-set-theme]')
+        if (b) applyTheme(b.dataset.setTheme, true)
       })
   }
 

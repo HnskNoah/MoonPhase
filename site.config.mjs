@@ -7,6 +7,8 @@ export const config = {
   // GitHub Pages: 项目站改成 '/仓库名/'，用户站保持 '/'
   base: '/',
   locale: 'zh-CN',
+  // 默认界面主题：reload（正统 P3R）| abyss（水下霓虹）| darkhour（0:00 墨绿金）
+  theme: 'reload',
   feed: { enabled: true, limit: 20 },
   social: [
     { label: 'GITHUB', url: 'https://github.com/your-name' },

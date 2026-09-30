@@ -27,7 +27,7 @@ docs/                构建产物 = 站点全部内容
 
 ## 改这些就能变成你自己的站
 
-1. `site.config.mjs`：`title` / `latinTitle` / `subtitle` / `author` / `description` / `base` / `nav` / `social`；
+1. `site.config.mjs`：`title` / `latinTitle` / `subtitle` / `author` / `description` / `base` / `theme` / `nav` / `social`；
 2. `content/pages/about.md`：自我介绍；
 3. `src/assets/favicon.svg`：换成你自己的标识；
 4. 删掉 `content/posts/` 里的示例文章。
@@ -61,6 +61,21 @@ draft: false
 - 站内链接写绝对路径（`/posts/xxx/`、`/feed.xml`），构建时会自动补上 `base` 前缀；
 - `{{author}}` `{{title}}` `{{year}}` 会在正文里被替换成站点配置的值；
 - 标签名如果不在 `site.config.mjs` 的 `tagKeys` 里，会用 slug 结果当目录名。
+
+## 三套主题怎么实现的
+
+主题不只是一组颜色。形状语言、字重、字体倾斜、描边方式都跟着一起换，靠的是 `:root` 里的几个语义变量：
+
+| 变量 | 作用 | abyss / darkhour | reload |
+| --- | --- | --- | --- |
+| `--panel-clip` / `--panel-radius` | 卡片与面板的轮廓 | 斜切 polygon | 无裁切，直角纸牌 |
+| `--chip-clip` / `--chip-radius` | 标签与按钮 | 小斜切 | 胶囊圆角 |
+| `--arch-clip` / `--arch-radius` | 头图框 | 拱形裁切 | 圆形（钴蓝圆碟） |
+| `--latin-style` / `--skew` | 拉丁标题 | 正体 | 斜体 / -7° |
+
+默认主题在 `site.config.mjs` 的 `theme` 里改（`reload` / `abyss` / `darkhour`）。想只换色不换形，就在对应 `[data-theme='...']` 块里删掉形状变量，让它继承 `:root` 的默认值。
+
+`reload` 的全部组件覆盖集中在 `src/styles/main.css` 的 `RELOAD · 正统 P3R 界面语言` 一节，参照物是 P3R 的社群列表与系统菜单：白底纸牌 + 硬偏移阴影、黑底罗马数字角标、青蓝子标签条、白旗 + 红描边的选中态、巨型裁切字母当水印。
 
 ## 部署到 GitHub Pages
 
@@ -101,7 +116,10 @@ git push   # .github/workflows/deploy.yml 会 npm ci && npm run build && 发布 
 - 归档页（按年分组）、标签墙、标签页
 - 关于页、404 页
 - RSS (`/feed.xml`) 与 sitemap、robots
-- 两套主题：**深渊**（默认冷蓝）/ **Dark Hour**（墨绿金），开关在右上角并记忆在 localStorage
+- 三套界面主题，右上角切换，选择记忆在 localStorage：
+  - **RELOAD**（默认）—— 正统 P3R 界面语言：白纸面 + 钴蓝圆碟 + 撕纸旗标 + 巨型斜体重型字 + 硬阴影纸牌 + 罗马数字角标 + 青蓝子标签条 + 红色选中描边
+  - **ABYSS** —— 水下霓虹：近黑深蓝 + 焦散波光 + 斜切面板 + 描边大字
+  - **DARK HOUR** —— 0:00 的墨绿金
 - 真实时间到 `0:00` 时自动进入 Dark Hour（未手动选过主题的前提下）
 - 左侧月相：跟随本地日期计算真实月相与亮度，同时是滚动进度条
 - 页面跳转的水幕转场、卡片的波光扫过

@@ -24,6 +24,22 @@ export function toDate(value) {
   return isNaN(d) ? new Date(0) : d
 }
 
+const ROMAN = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]
+
+/** 1 -> I，2 -> II…（P3R 的社群列表用罗马数字角标） */
+export function roman(n) {
+  if (!Number.isFinite(n) || n < 1 || n > 39) return String(n)
+  let out = ''
+  let rest = n
+  for (const [v, s] of ROMAN) {
+    while (rest >= v) {
+      out += s
+      rest -= v
+    }
+  }
+  return out
+}
+
 /** 2026-09-30 -> "2026.09.30" */
 export function fmtDate(d) {
   const p = (n) => String(n).padStart(2, '0')

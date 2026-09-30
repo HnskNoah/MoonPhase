@@ -5,11 +5,24 @@
 
 /* ---------- 令牌 ---------- */
 :root {
+  /* 形状语言：深渊/Dark Hour 用斜切，reload 用平贴纸牌 + 胶囊 */
   --blade: polygon(0 16px, 16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
   --blade-sm: polygon(0 9px, 9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
   --arch: polygon(50% 0, 100% 18%, 100% 100%, 0 100%, 0 18%);
+  --flag: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+
+  --panel-clip: var(--blade);
+  --panel-radius: 0px;
+  --chip-clip: var(--blade-sm);
+  --chip-radius: 0px;
+  --arch-clip: var(--arch);
+  --arch-radius: 0px;
+  --title-weight: 900;
+  --latin-style: normal;
+  --skew: 0deg;
 
   --font-display: 'Bebas Neue', 'Noto Sans SC', 'Hiragino Sans', 'Microsoft YaHei', sans-serif;
+  --font-oblique: 'Archivo', 'Noto Sans SC', 'Hiragino Sans', 'Microsoft YaHei', sans-serif;
   --font-sans: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
@@ -20,7 +33,7 @@
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* 深渊（默认 / 白天基调的深蓝） */
+/* 深渊（水下霓虹） */
 [data-theme='abyss'] {
   --bg-0: #030a14;
   --bg-1: #061a2e;
@@ -38,6 +51,39 @@
   --panel-2: rgba(8, 32, 55, 0.82);
   --sea-1: rgba(79, 203, 255, 0.16);
   --sea-2: rgba(20, 90, 150, 0.34);
+}
+
+/* RELOAD（正统 P3R：白纸 + 钴蓝圆盘 + 巨型斜体字 + 红描边旗标） */
+[data-theme='reload'] {
+  --bg-0: #edf2f9;
+  --bg-1: #ffffff;
+  --bg-2: #1b3f9e;
+  --glow: #35c6f5;
+  --ink: #0a121c;
+  --ink-2: #3d5064;
+  --ink-3: #8195a8;
+  --accent: #1a5fb4;
+  --accent-2: #35c6f5;
+  --accent-ink: #ffffff;
+  --cyan: #35c6f5;
+  --cobalt: #122c68;
+  --navy: #0b1c3d;
+  --red: #e8402a;
+  --flag-ink: #ffffff;
+  --line: rgba(10, 18, 28, 0.14);
+  --line-2: rgba(10, 18, 28, 0.5);
+  --panel: #ffffff;
+  --panel-2: #0b1c3d;
+  --sea-1: rgba(53, 198, 245, 0.28);
+  --sea-2: rgba(18, 44, 104, 0.55);
+  --panel-clip: none;
+  --panel-radius: 0px;
+  --chip-clip: none;
+  --chip-radius: 999px;
+  --arch-clip: none;
+  --arch-radius: 0px;
+  --latin-style: italic;
+  --skew: -7deg;
 }
 
 /* Dark Hour（0:00 的墨绿金） */
@@ -303,7 +349,8 @@ body.is-entering .veil i {
   flex-direction: column;
   justify-content: center;
   padding: 8px 18px;
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
   border: 1px solid transparent;
 }
 .nav-item::before {
@@ -353,7 +400,8 @@ body.is-entering .veil i {
   color: var(--accent);
   padding: 7px 10px;
   border: 1px solid var(--line-2);
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
   background: var(--panel);
 }
 .dark-clock.is-dark {
@@ -367,43 +415,52 @@ body.is-entering .veil i {
   }
 }
 
-.theme-btn {
+/* 三态主题切换器 */
+.theme-switch {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line-2);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
+  overflow: hidden;
+}
+.ts-opt {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  padding: 8px 13px;
   font: 400 11px/1 var(--font-display);
-  letter-spacing: 0.2em;
-  color: var(--ink-2);
+  letter-spacing: 0.18em;
+  color: var(--ink-3);
   background: transparent;
-  border: 1px solid var(--line-2);
-  clip-path: var(--blade-sm);
-  padding: 8px 12px;
+  border: 0;
   cursor: pointer;
   transition:
-    color 0.3s,
-    border-color 0.3s;
+    color 0.28s,
+    background 0.28s;
 }
-.theme-btn:hover {
+.ts-opt + .ts-opt {
+  border-left: 1px solid var(--line);
+}
+.ts-opt:hover {
   color: var(--accent);
-  border-color: var(--accent);
 }
-.theme-btn-dot {
-  width: 9px;
-  height: 9px;
+.ts-flag {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--ink-3);
-  box-shadow: 0 0 0 2px transparent;
-  transition:
-    background 0.3s,
-    box-shadow 0.3s;
+  background: currentColor;
+  opacity: 0.35;
+  transition: opacity 0.28s;
 }
-.theme-btn[aria-pressed='true'] .theme-btn-dot {
+.ts-opt.is-on {
+  color: var(--accent-ink);
   background: var(--accent);
-  box-shadow: 0 0 12px var(--accent);
 }
-.theme-btn[aria-pressed='true'] {
-  color: var(--accent);
-  border-color: var(--accent);
+.ts-opt.is-on .ts-flag {
+  opacity: 1;
+  box-shadow: 0 0 10px currentColor;
 }
 
 .menu-btn {
@@ -415,7 +472,8 @@ body.is-entering .veil i {
   border: 1px solid var(--line-2);
   padding: 9px 14px;
   cursor: pointer;
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
 }
 
 /* ---------- 月相进度 ---------- */
@@ -551,7 +609,8 @@ body.is-entering .veil i {
   letter-spacing: 0.12em;
   color: var(--accent);
   border: 1px solid var(--line-2);
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
   background: rgba(0, 0, 0, 0.25);
   transition:
     background 0.25s,
@@ -619,7 +678,8 @@ body.is-entering .veil i {
   gap: 10px;
   padding: 13px 24px;
   border: 1px solid var(--line-2);
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -701,7 +761,8 @@ body.is-entering .veil i {
 .hero-frame {
   position: relative;
   overflow: hidden;
-  clip-path: var(--arch);
+  clip-path: var(--arch-clip);
+  border-radius: var(--arch-radius);
   border: 1px solid var(--line-2);
   background: var(--panel-2);
   aspect-ratio: 16 / 11;
@@ -716,7 +777,7 @@ body.is-entering .veil i {
   animation: sink 24s ease-in-out infinite alternate;
 }
 /* Dark Hour 下把海水一起染成墨绿，避免蓝绿打架 */
-[data-theme="darkhour"] .hero-img {
+[data-theme='darkhour'] .hero-img {
   filter: hue-rotate(-42deg) saturate(0.8) brightness(0.88) contrast(1.06);
 }
 .hero-frame::after {
@@ -862,7 +923,8 @@ body.is-entering .veil i {
   padding: 22px 26px;
   background: var(--panel);
   border: 1px solid var(--line);
-  clip-path: var(--blade);
+  clip-path: var(--panel-clip);
+  border-radius: var(--panel-radius);
   animation: rise 0.6s var(--ease) both;
   animation-delay: calc(var(--i) * 0.06s);
 }
@@ -974,7 +1036,8 @@ body.is-entering .veil i {
   padding: 26px clamp(20px, 3vw, 34px);
   border: 1px solid var(--line-2);
   background: linear-gradient(115deg, rgba(0, 0, 0, 0.35), transparent), var(--panel-2);
-  clip-path: var(--blade);
+  clip-path: var(--panel-clip);
+  border-radius: var(--panel-radius);
   transition:
     border-color 0.3s,
     transform 0.3s var(--ease);
@@ -1203,7 +1266,8 @@ body.is-entering .veil i {
   padding: 18px 22px;
   background: var(--panel);
   border-left: 3px solid var(--accent);
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
   color: var(--ink-2);
   font-size: 15.5px;
 }
@@ -1224,7 +1288,8 @@ body.is-entering .veil i {
   overflow-x: auto;
   background: rgba(0, 5, 10, 0.82);
   border: 1px solid var(--line);
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
   line-height: 1.75;
 }
 .prose pre code {
@@ -1260,7 +1325,8 @@ body.is-entering .veil i {
 .prose img {
   margin: 1.8em auto;
   border: 1px solid var(--line-2);
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
 }
 .prose hr {
   margin: 3em auto;
@@ -1301,7 +1367,8 @@ body.is-entering .veil i {
   padding: 18px 22px;
   background: var(--panel);
   border: 1px solid var(--line);
-  clip-path: var(--blade-sm);
+  clip-path: var(--chip-clip);
+  border-radius: var(--chip-radius);
   transition:
     border-color 0.3s,
     transform 0.3s var(--ease);
@@ -1417,7 +1484,8 @@ body.is-entering .veil i {
   padding: 24px 22px;
   background: var(--panel);
   border: 1px solid var(--line);
-  clip-path: var(--blade);
+  clip-path: var(--panel-clip);
+  border-radius: var(--panel-radius);
   overflow: hidden;
   animation: rise 0.5s var(--ease) both;
   animation-delay: calc(var(--i) * 0.05s);
@@ -1553,6 +1621,705 @@ body.is-entering .veil i {
   font-family: var(--font-mono);
 }
 
+/* ==========================================================================
+   RELOAD · 正统 P3R 界面语言
+   白纸面 / 钴蓝圆碟 / 撕纸旗标 / 巨型斜体重型字 / 硬阴影纸牌 / 红与青的强调
+   ========================================================================== */
+
+/* 新元素在另外两套主题里不出现 */
+.glyphs,
+.card-roman,
+.card-sub {
+  display: none;
+}
+
+/* ---------- 背景：纸面 + 网点 + 钴蓝圆碟 ---------- */
+[data-theme='reload'] .sea::before {
+  background:
+    radial-gradient(120% 90% at 82% 8%, rgba(53, 198, 245, 0.16), transparent 55%),
+    linear-gradient(180deg, #ffffff 0%, var(--bg-0) 55%, #d9e4f2 100%);
+}
+[data-theme='reload'] .sea::after {
+  content: '';
+  position: absolute;
+  right: -18vw;
+  bottom: -30vh;
+  top: auto;
+  width: 48vw;
+  height: 48vw;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.35), transparent 45%),
+    linear-gradient(165deg, #2f6fd8 0%, var(--bg-2) 45%, var(--cobalt) 100%);
+  box-shadow: 0 40px 120px -40px rgba(11, 28, 61, 0.55);
+}
+/* 首页的圆盘留在右上，正文页不让它压到标题 */
+[data-theme='reload'] body.page-home .sea::after {
+  bottom: auto;
+  top: -26vh;
+  right: -22vw;
+  width: 60vw;
+  height: 60vw;
+}
+[data-theme='reload'] .sea-surface {
+  display: none;
+}
+[data-theme='reload'] .sea-rays {
+  background: repeating-linear-gradient(
+    78deg,
+    transparent 0 74px,
+    rgba(255, 255, 255, 0.5) 74px 76px,
+    transparent 76px 150px
+  );
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 60%);
+  opacity: 0.35;
+  filter: none;
+}
+[data-theme='reload'] .sea-canvas {
+  display: none;
+}
+[data-theme='reload'] .sea-vignette {
+  background: radial-gradient(120% 90% at 50% 20%, transparent 55%, rgba(11, 28, 61, 0.1) 100%);
+}
+[data-theme='reload'] .sea-grain {
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+}
+
+/* ---------- 巨型裁切字母（P3R 菜单的招牌） ---------- */
+[data-theme='reload'] .glyphs {
+  display: block;
+  position: fixed;
+  left: -0.055em;
+  top: 30vh;
+  z-index: -1;
+  max-height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  writing-mode: vertical-rl;
+  font: italic 900 clamp(120px, 25vw, 330px) / 0.8 var(--font-oblique);
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  transform: skew(-7deg);
+  /* 当水印用：P3R 里这些字母从不和正文抢位置 */
+  opacity: 0.075;
+}
+
+/* ---------- 顶栏：白纸 + 2px 黑线 + 斜体大写 ---------- */
+[data-theme='reload'] .site-head {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 2px solid var(--ink);
+}
+[data-theme='reload'] .brand-text b {
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+[data-theme='reload'] .brand-text i {
+  color: var(--ink-2);
+}
+[data-theme='reload'] .brand-moon {
+  background: radial-gradient(circle at 34% 30%, #fff, var(--cyan) 42%, var(--cobalt) 100%);
+  box-shadow: 0 0 0 2px var(--ink);
+}
+[data-theme='reload'] .brand-moon::after {
+  display: none;
+}
+
+[data-theme='reload'] .nav-item {
+  clip-path: var(--flag);
+  border-radius: 0;
+  padding: 9px 22px 9px 14px;
+  margin-left: 2px;
+}
+[data-theme='reload'] .nav-latin {
+  display: none;
+}
+[data-theme='reload'] .nav-label {
+  margin: 0;
+  font-family: var(--font-oblique);
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  transform: skew(-7deg);
+}
+[data-theme='reload'] .nav-item::before {
+  background: rgba(11, 28, 61, 0.08);
+  transform: none;
+  opacity: 0;
+  transition: opacity 0.24s;
+}
+[data-theme='reload'] .nav-item:hover::before {
+  opacity: 1;
+}
+[data-theme='reload'] .nav-item.is-on::before {
+  background: #fff;
+  opacity: 1;
+}
+/* 选中态 = 白底 + 红字 + 品红描边（drop-shadow 会跟随 clip-path） */
+[data-theme='reload'] .nav-item.is-on {
+  filter: drop-shadow(2px 0 0 var(--red)) drop-shadow(-2px 0 0 var(--red)) drop-shadow(0 2px 0 var(--red))
+    drop-shadow(0 -2px 0 var(--red));
+}
+[data-theme='reload'] .nav-item.is-on .nav-label {
+  color: var(--red);
+}
+
+[data-theme='reload'] .dark-clock {
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+}
+[data-theme='reload'] .dark-clock.is-dark {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--ink);
+}
+[data-theme='reload'] .theme-switch {
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+}
+[data-theme='reload'] .ts-opt {
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+[data-theme='reload'] .ts-opt.is-on {
+  background: var(--ink);
+  color: #fff;
+}
+[data-theme='reload'] .menu-btn {
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+  color: var(--ink);
+}
+
+/* ---------- 月相轨 ---------- */
+[data-theme='reload'] .mp-label,
+[data-theme='reload'] .mp-track {
+  color: var(--ink-3);
+}
+[data-theme='reload'] .moon-disc {
+  background: radial-gradient(circle at 34% 30%, #fff, var(--cyan) 45%, var(--cobalt) 100%);
+  box-shadow: 0 0 0 1.5px var(--ink);
+}
+[data-theme='reload'] .moon-shadow {
+  background: rgba(255, 255, 255, 0.86);
+}
+[data-theme='reload'] .mp-track {
+  background: rgba(10, 18, 28, 0.12);
+}
+[data-theme='reload'] .mp-fill {
+  background: linear-gradient(180deg, var(--cobalt), var(--cyan));
+}
+
+/* ---------- HERO ---------- */
+[data-theme='reload'] .hero-title-latin {
+  -webkit-text-stroke: 0;
+  color: var(--ink);
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  transform: skew(-7deg);
+}
+[data-theme='reload'] .hero-title-main {
+  background: none;
+  color: var(--ink);
+  -webkit-text-fill-color: var(--ink);
+  font-weight: 900;
+  text-shadow: none;
+  transform: skew(-4deg);
+}
+[data-theme='reload'] .hero-sub {
+  color: var(--cobalt);
+  font-weight: 900;
+}
+[data-theme='reload'] .hero-desc {
+  color: var(--ink-2);
+}
+[data-theme='reload'] .kicker {
+  color: var(--red);
+}
+[data-theme='reload'] .kicker-tick {
+  background: var(--red);
+  box-shadow: none;
+}
+[data-theme='reload'] .hero-frame {
+  aspect-ratio: 1 / 1;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  clip-path: none;
+  box-shadow: 16px 16px 0 rgba(18, 44, 104, 0.14);
+}
+[data-theme='reload'] .hero-img {
+  /* 把照片压成 P3R 的蓝白双色调 */
+  filter: grayscale(1) contrast(1.3) brightness(1.3) sepia(1) hue-rotate(163deg) saturate(3.4);
+  animation: none;
+  transform: scale(1.02);
+}
+[data-theme='reload'] .hero-frame::after {
+  background:
+    linear-gradient(0deg, rgba(18, 44, 104, 0.42) 0%, transparent 52%),
+    radial-gradient(circle at 1px 1px, rgba(10, 18, 28, 0.28) 1px, transparent 1.4px) 0 0 / 7px 7px;
+  opacity: 0.34;
+}
+[data-theme='reload'] .hero-frame-edge {
+  display: none;
+}
+[data-theme='reload'] .hero-stats {
+  background: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+[data-theme='reload'] .hero-stats > div {
+  background: #fff;
+}
+[data-theme='reload'] .hero-stats dt {
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 800;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+}
+[data-theme='reload'] .hero-stats dd {
+  color: var(--cobalt);
+  font-weight: 700;
+}
+[data-theme='reload'] .tide {
+  background: linear-gradient(90deg, transparent, var(--ink) 20%, var(--red) 50%, var(--ink) 80%, transparent);
+}
+[data-theme='reload'] .tide span {
+  background: radial-gradient(closest-side, var(--cyan), transparent);
+}
+
+/* ---------- 区块标题 ---------- */
+[data-theme='reload'] .st-latin {
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  color: var(--cobalt);
+  transform: skew(-7deg);
+}
+[data-theme='reload'] .st-main {
+  color: var(--ink);
+}
+[data-theme='reload'] .section-rule {
+  background: linear-gradient(90deg, var(--ink), transparent);
+}
+[data-theme='reload'] .page-title-main {
+  color: var(--ink);
+}
+[data-theme='reload'] .page-title-main::after {
+  background: var(--red);
+  transform: skew(-22deg);
+  height: 6px;
+}
+[data-theme='reload'] .page-title-latin {
+  color: var(--ink-3);
+}
+[data-theme='reload'] .page-meta {
+  color: var(--ink-2);
+}
+[data-theme='reload'] .page-lead,
+[data-theme='reload'] .quote-latin {
+  color: var(--ink-2);
+}
+[data-theme='reload'] .quote {
+  color: var(--ink);
+}
+[data-theme='reload'] .quote-block {
+  border-color: var(--ink);
+}
+
+/* ---------- 列表卡片：硬阴影纸牌 ---------- */
+[data-theme='reload'] .card {
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: 7px 7px 0 rgba(18, 44, 104, 0.13);
+  transition:
+    transform 0.22s var(--ease),
+    box-shadow 0.22s var(--ease),
+    border-color 0.22s;
+}
+[data-theme='reload'] .card::before {
+  display: none;
+}
+[data-theme='reload'] .card:hover {
+  border-color: var(--cobalt);
+  transform: translate(-3px, -3px);
+  box-shadow: 12px 12px 0 rgba(53, 198, 245, 0.4);
+}
+[data-theme='reload'] .card-side {
+  border-right: 1.5px solid var(--ink);
+  padding-right: 18px;
+  gap: 6px;
+}
+[data-theme='reload'] .card-roman {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 3px 9px 4px;
+  font: italic 900 12px/1 var(--font-oblique);
+  color: #fff;
+  background: var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 68%, 78% 100%, 0 100%);
+}
+[data-theme='reload'] .card-num {
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 52px;
+  color: rgba(10, 18, 28, 0.16);
+}
+[data-theme='reload'] .card:hover .card-num {
+  color: var(--cyan);
+}
+[data-theme='reload'] .card-date {
+  color: var(--ink-3);
+}
+[data-theme='reload'] .card-sub {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 3px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #06203a;
+  background: var(--cyan);
+  clip-path: var(--flag);
+}
+[data-theme='reload'] .card-title a {
+  color: var(--ink);
+}
+[data-theme='reload'] .card:hover .card-title a {
+  color: var(--cobalt);
+}
+[data-theme='reload'] .card-desc {
+  color: var(--ink-2);
+}
+[data-theme='reload'] .chip {
+  background: #fff;
+  color: var(--cobalt);
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  clip-path: none;
+}
+[data-theme='reload'] .chip:hover {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--ink);
+}
+[data-theme='reload'] .card-more,
+[data-theme='reload'] .card-meta {
+  color: var(--ink-3);
+}
+[data-theme='reload'] .card-more:hover {
+  color: var(--red);
+}
+
+/* ---------- 重点条 ---------- */
+[data-theme='reload'] .feature {
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: 9px 9px 0 rgba(18, 44, 104, 0.16);
+}
+[data-theme='reload'] .feature:hover {
+  border-color: var(--cobalt);
+  transform: translate(-3px, -3px);
+}
+[data-theme='reload'] .feature-idx {
+  /* 竖排会顶破行高，改成 P3R 的小旗标 */
+  writing-mode: horizontal-tb;
+  align-self: start;
+  padding: 4px 12px 5px;
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  clip-path: var(--flag);
+  color: #fff;
+  background: var(--cobalt);
+}
+[data-theme='reload'] .feature-main b {
+  color: var(--ink);
+}
+[data-theme='reload'] .feature-main i {
+  color: var(--ink-2);
+}
+[data-theme='reload'] .feature-go {
+  color: var(--red);
+}
+
+/* ---------- 按钮 ---------- */
+[data-theme='reload'] .btn {
+  background: #fff;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: 4px 4px 0 rgba(18, 44, 104, 0.2);
+  font-weight: 900;
+}
+[data-theme='reload'] .btn::before {
+  background: var(--ink);
+  transform: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+[data-theme='reload'] .btn:hover {
+  color: #fff;
+  border-color: var(--ink);
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 var(--cyan);
+}
+[data-theme='reload'] .btn:hover::before {
+  opacity: 1;
+}
+[data-theme='reload'] .btn--solid {
+  background: var(--cobalt);
+  color: #fff;
+  border-color: var(--ink);
+}
+[data-theme='reload'] .btn--solid::before {
+  background: var(--red);
+}
+
+/* ---------- 正文 ---------- */
+[data-theme='reload'] .prose {
+  color: #16202c;
+}
+[data-theme='reload'] .prose h2 {
+  color: var(--ink);
+  border-left-color: var(--red);
+}
+[data-theme='reload'] .prose h2::after {
+  background: linear-gradient(90deg, var(--cyan), transparent);
+}
+[data-theme='reload'] .prose h3 {
+  color: var(--cobalt);
+}
+[data-theme='reload'] .prose h4 {
+  color: var(--ink-2);
+}
+[data-theme='reload'] .prose a {
+  color: var(--accent);
+  border-bottom-color: rgba(26, 95, 180, 0.35);
+}
+[data-theme='reload'] .prose a:hover {
+  color: var(--red);
+  border-bottom-color: var(--red);
+  background: rgba(53, 198, 245, 0.16);
+}
+[data-theme='reload'] .prose strong {
+  color: #000;
+}
+[data-theme='reload'] .prose blockquote {
+  background: #fff;
+  border-left: 4px solid var(--red);
+  border-radius: 0;
+  clip-path: none;
+  color: var(--ink-2);
+  box-shadow: 5px 5px 0 rgba(18, 44, 104, 0.1);
+}
+[data-theme='reload'] .prose code {
+  background: rgba(18, 44, 104, 0.07);
+  border-color: rgba(10, 18, 28, 0.18);
+  color: var(--cobalt);
+}
+[data-theme='reload'] .prose pre {
+  background: var(--navy);
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: 7px 7px 0 rgba(53, 198, 245, 0.35);
+}
+[data-theme='reload'] .prose pre code {
+  color: #d9f2ff;
+  background: none;
+}
+[data-theme='reload'] .prose th {
+  background: var(--cobalt);
+  color: #fff;
+}
+[data-theme='reload'] .prose td,
+[data-theme='reload'] .prose th {
+  border-color: rgba(10, 18, 28, 0.22);
+}
+[data-theme='reload'] .prose tbody tr:hover {
+  background: rgba(53, 198, 245, 0.1);
+}
+[data-theme='reload'] .prose img {
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+}
+[data-theme='reload'] .toc {
+  border-left-color: var(--ink);
+}
+[data-theme='reload'] .toc-head {
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 900;
+  color: var(--cobalt);
+}
+[data-theme='reload'] .toc a {
+  color: var(--ink-2);
+}
+[data-theme='reload'] .toc a.is-active {
+  color: var(--red);
+  border-left-color: var(--red);
+  background: rgba(53, 198, 245, 0.12);
+}
+[data-theme='reload'] .end-mark {
+  color: var(--ink-3);
+  letter-spacing: 0.5em;
+}
+[data-theme='reload'] .post-nav .pn {
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: 5px 5px 0 rgba(18, 44, 104, 0.12);
+}
+[data-theme='reload'] .post-nav .pn:hover {
+  box-shadow: 8px 8px 0 rgba(53, 198, 245, 0.45);
+}
+[data-theme='reload'] .post-nav .pn b {
+  color: var(--ink);
+}
+[data-theme='reload'] .post-nav .pn span {
+  color: var(--ink-3);
+}
+
+/* ---------- 归档 / 标签 / 404 ---------- */
+[data-theme='reload'] .arch-year-title {
+  -webkit-text-stroke: 0;
+  color: var(--ink);
+  font-style: italic;
+  font-weight: 900;
+  transform: skew(-6deg);
+}
+[data-theme='reload'] .arch-year-title em {
+  color: var(--red);
+}
+[data-theme='reload'] .arch-list {
+  border-top-color: var(--ink);
+}
+[data-theme='reload'] .arch-list li {
+  border-bottom-color: rgba(10, 18, 28, 0.18);
+}
+[data-theme='reload'] .arch-list a:hover {
+  background: #fff;
+  box-shadow: inset 4px 0 0 var(--red);
+}
+[data-theme='reload'] .arch-list b {
+  color: var(--ink);
+}
+[data-theme='reload'] .arch-list a:hover b {
+  color: var(--cobalt);
+}
+[data-theme='reload'] .tag-card {
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: 6px 6px 0 rgba(18, 44, 104, 0.13);
+}
+[data-theme='reload'] .tag-card:hover {
+  box-shadow: 9px 9px 0 rgba(53, 198, 245, 0.45);
+  border-color: var(--cobalt);
+}
+[data-theme='reload'] .tc-label {
+  color: var(--ink);
+}
+[data-theme='reload'] .tc-count {
+  color: var(--cyan);
+  -webkit-text-stroke: 1.5px var(--cobalt);
+}
+[data-theme='reload'] .nf-code {
+  -webkit-text-stroke: 3px var(--ink);
+  color: rgba(53, 198, 245, 0.25);
+}
+[data-theme='reload'] .nf-title {
+  color: var(--ink);
+}
+[data-theme='reload'] .nf-desc {
+  color: var(--ink-2);
+}
+
+/* ---------- 页脚：黑底撕纸带 ---------- */
+[data-theme='reload'] .site-foot {
+  background: var(--ink);
+  border-top: 0;
+}
+[data-theme='reload'] .foot-mori-text {
+  color: #fff;
+  font-family: var(--font-oblique);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.34em;
+}
+[data-theme='reload'] .foot-rule {
+  background: linear-gradient(90deg, transparent, var(--red));
+}
+[data-theme='reload'] .foot-rule:last-child {
+  background: linear-gradient(90deg, var(--red), transparent);
+}
+[data-theme='reload'] .foot-copy,
+[data-theme='reload'] .foot-links,
+[data-theme='reload'] .foot-meta {
+  color: rgba(255, 255, 255, 0.6);
+}
+[data-theme='reload'] .foot-links a {
+  color: var(--cyan);
+}
+[data-theme='reload'] .foot-links a:hover {
+  color: #fff;
+  border-color: #fff;
+}
+
+/* ---------- 转场：水波扩散代替刀锋横扫 ---------- */
+[data-theme='reload'] .veil {
+  display: block;
+}
+[data-theme='reload'] .veil i {
+  position: absolute;
+  inset: 0;
+  flex: none;
+  clip-path: none;
+  transform: scale(0);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, var(--cyan), var(--cobalt) 70%);
+  transition: transform 0.5s var(--ease);
+}
+[data-theme='reload'] .veil i:nth-child(1) {
+  width: 100%;
+  height: 100%;
+}
+[data-theme='reload'] .veil i:nth-child(2),
+[data-theme='reload'] .veil i:nth-child(3) {
+  display: none;
+}
+[data-theme='reload'] body.is-leaving .veil i {
+  transform: scale(2.6);
+}
+[data-theme='reload'] body.is-entering .veil i {
+  transform: scale(0);
+}
+
 /* ---------- 响应式 ---------- */
 @media (max-width: 1320px) {
   .moon-progress {
@@ -1665,8 +2432,12 @@ body.is-entering .veil i {
   .brand-text i {
     display: none;
   }
-  .theme-btn-key {
+  /* 窄屏只留三个圆点，避免切换器挤爆顶栏 */
+  .ts-text {
     display: none;
+  }
+  .ts-opt {
+    padding: 8px 10px;
   }
 }
 @media (max-width: 520px) {

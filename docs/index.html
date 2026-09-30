@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="abyss">
+<html lang="zh-CN" data-theme="reload">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,7 +17,7 @@
 <link rel="alternate" type="application/rss+xml" title="月相记录" href="/feed.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,800;0,900;1,600;1,800;1,900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
 <link rel="stylesheet" href="/assets/main.css">
 
 <script>(function(){try{var t=localStorage.getItem('p3-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
@@ -31,6 +31,8 @@
   <div class="sea-vignette"></div>
   <div class="sea-grain"></div>
 </div>
+
+<div class="glyphs" aria-hidden="true"><b>MOON PHASE</b></div>
 
 <div class="veil" aria-hidden="true"><i></i><i></i><i></i></div>
 
@@ -59,10 +61,11 @@
       </a></nav>
   <div class="head-tools">
     <time class="dark-clock" id="dark-clock" title="Dark Hour 时钟">--:--</time>
-    <button class="theme-btn" id="theme-toggle" type="button" aria-pressed="false">
-      <span class="theme-btn-key">DARK&nbsp;HOUR</span>
-      <span class="theme-btn-dot" aria-hidden="true"></span>
-    </button>
+    <div class="theme-switch" id="theme-switch" role="group" aria-label="界面主题">
+      <button class="ts-opt" type="button" data-set-theme="reload"><span class="ts-flag"></span><span class="ts-text">RELOAD</span></button>
+      <button class="ts-opt" type="button" data-set-theme="abyss"><span class="ts-flag"></span><span class="ts-text">ABYSS</span></button>
+      <button class="ts-opt" type="button" data-set-theme="darkhour"><span class="ts-flag"></span><span class="ts-text">DARK&nbsp;HOUR</span></button>
+    </div>
     <button class="menu-btn" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">MENU</button>
   </div>
 </header>
@@ -129,8 +132,10 @@
   <div class="card-list">
     <article class="card card--row" style="--i:1">
   <div class="card-side">
+    <span class="card-roman" aria-hidden="true">II</span>
     <span class="card-num">02</span>
     <time class="card-date" datetime="2026-09-21">SEP 21, 2026</time>
+    <span class="card-sub">MEMENTO MORI</span>
   </div>
   <div class="card-body">
     <h2 class="card-title"><a href="/posts/002-memento-mori/">把截止日期写进标题里</a></h2>
@@ -144,8 +149,10 @@
   </div>
 </article><article class="card card--row" style="--i:2">
   <div class="card-side">
+    <span class="card-roman" aria-hidden="true">III</span>
     <span class="card-num">03</span>
     <time class="card-date" datetime="2026-09-12">SEP 12, 2026</time>
+    <span class="card-sub">BLUE WATER</span>
   </div>
   <div class="card-body">
     <h2 class="card-title"><a href="/posts/003-blue-water-ui/">水下的界面：为什么 P3R 的蓝是对的</a></h2>
@@ -159,8 +166,10 @@
   </div>
 </article><article class="card card--row" style="--i:3">
   <div class="card-side">
+    <span class="card-roman" aria-hidden="true">IV</span>
     <span class="card-num">04</span>
     <time class="card-date" datetime="2026-08-30">AUG 30, 2026</time>
+    <span class="card-sub">RETRO</span>
   </div>
   <div class="card-body">
     <h2 class="card-title"><a href="/posts/004-build-retro/">用 90 行脚本换掉了整个静态生成器</a></h2>
@@ -174,8 +183,10 @@
   </div>
 </article><article class="card card--row" style="--i:4">
   <div class="card-side">
+    <span class="card-roman" aria-hidden="true">V</span>
     <span class="card-num">05</span>
     <time class="card-date" datetime="2026-08-14">AUG 14, 2026</time>
+    <span class="card-sub">LOG 08</span>
   </div>
   <div class="card-body">
     <h2 class="card-title"><a href="/posts/005-log-august/">月相观测记录 · 八月</a></h2>
@@ -189,8 +200,10 @@
   </div>
 </article><article class="card card--row" style="--i:5">
   <div class="card-side">
+    <span class="card-roman" aria-hidden="true">VI</span>
     <span class="card-num">06</span>
     <time class="card-date" datetime="2026-07-29">JUL 29, 2026</time>
+    <span class="card-sub">READING</span>
   </div>
   <div class="card-body">
     <h2 class="card-title"><a href="/posts/006-reading-longterm/">读《慢生产力》：长期主义的两件小事</a></h2>

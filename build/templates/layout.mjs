@@ -1,5 +1,5 @@
 import { config, url, absUrl } from '../context.mjs'
-import { escapeHtml, fmtDateLatin } from '../lib/util.mjs'
+import { escapeHtml, fmtDateLatin, roman } from '../lib/util.mjs'
 
 const THEME_BOOTSTRAP = `
 <script>(function(){try{var t=localStorage.getItem('p3-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
@@ -55,7 +55,7 @@ export function layout({ title, description, body = '', path: pagePath = '/', ac
   const desc = description || config.description
   const canonical = absUrl(pagePath)
   return `<!doctype html>
-<html lang="${config.locale || 'zh-CN'}" data-theme="abyss">
+<html lang="${config.locale || 'zh-CN'}" data-theme="${escapeHtml(config.theme || 'reload')}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,7 +73,7 @@ export function layout({ title, description, body = '', path: pagePath = '/', ac
 <link rel="alternate" type="application/rss+xml" title="${escapeHtml(config.title)}" href="${url('/feed.xml')}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,800;0,900;1,600;1,800;1,900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
 <link rel="stylesheet" href="${url('/assets/main.css')}">
 ${THEME_BOOTSTRAP}${head}
 </head>
@@ -85,6 +85,8 @@ ${THEME_BOOTSTRAP}${head}
   <div class="sea-vignette"></div>
   <div class="sea-grain"></div>
 </div>
+
+<div class="glyphs" aria-hidden="true"><b>${escapeHtml(config.latinTitle)}</b></div>
 
 <div class="veil" aria-hidden="true"><i></i><i></i><i></i></div>
 
@@ -101,10 +103,11 @@ ${THEME_BOOTSTRAP}${head}
   <nav id="site-nav" class="site-nav" aria-label="主导航">${navItems(active)}</nav>
   <div class="head-tools">
     <time class="dark-clock" id="dark-clock" title="Dark Hour 时钟">--:--</time>
-    <button class="theme-btn" id="theme-toggle" type="button" aria-pressed="false">
-      <span class="theme-btn-key">DARK&nbsp;HOUR</span>
-      <span class="theme-btn-dot" aria-hidden="true"></span>
-    </button>
+    <div class="theme-switch" id="theme-switch" role="group" aria-label="界面主题">
+      <button class="ts-opt" type="button" data-set-theme="reload"><span class="ts-flag"></span><span class="ts-text">RELOAD</span></button>
+      <button class="ts-opt" type="button" data-set-theme="abyss"><span class="ts-flag"></span><span class="ts-text">ABYSS</span></button>
+      <button class="ts-opt" type="button" data-set-theme="darkhour"><span class="ts-flag"></span><span class="ts-text">DARK&nbsp;HOUR</span></button>
+    </div>
     <button class="menu-btn" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">MENU</button>
   </div>
 </header>
@@ -142,10 +145,13 @@ export function pageHead({ kicker = '', latin = '', title, meta = '', actions = 
 export function postCard(p, { index = 0, variant = 'row' } = {}) {
   const href = url(`/posts/${p.slug}/`)
   const tags = p.tagItems.map((t) => `<a class="chip" href="${url(`/tags/${t.key}/`)}">${escapeHtml(t.label)}</a>`).join('')
+  const sub = escapeHtml(p.latin || p.tagItems.map((t) => t.label).join(' / ') || 'RECORD')
   return `<article class="card card--${variant}" style="--i:${index}">
   <div class="card-side">
+    <span class="card-roman" aria-hidden="true">${roman(index + 1)}</span>
     <span class="card-num">${String(index + 1).padStart(2, '0')}</span>
     <time class="card-date" datetime="${p.date.toISOString().slice(0, 10)}">${fmtDateLatin(p.date)}</time>
+    <span class="card-sub">${sub}</span>
   </div>
   <div class="card-body">
     <h2 class="card-title"><a href="${href}">${escapeHtml(p.title)}</a></h2>
