@@ -1640,10 +1640,11 @@ img {
   width: 62vw;
   height: 62vw;
   border-radius: 50%;
-  /* 和首页大图用同一张素材、同一套双色调，两处才对得上 */
+  /* 和首页大图用同一张素材、同一套双色调，两处才对得上；
+     图片地址由 Layout 用 getImage() 注入到 --sea-disc-img */
   background:
     radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.22), transparent 48%),
-    url('../assets/abyss.jpg') 50% 45% / cover no-repeat;
+    var(--sea-disc-img) 50% 45% / cover no-repeat;
   filter: grayscale(1) contrast(1.28) brightness(1.18) sepia(1) hue-rotate(163deg) saturate(3.3);
   box-shadow: 0 40px 120px -40px rgba(11, 28, 61, 0.55);
 }

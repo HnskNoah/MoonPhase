@@ -1,7 +1,9 @@
 ---
 import '../styles/main.css'
+import { getImage } from 'astro:assets'
+import abyss from '../assets/abyss.jpg'
 import { config } from '../consts'
-import { u, escapeHtml, fmtDateLatin } from '../lib/site'
+import { u, fmtDateLatin } from '../lib/site'
 
 interface Props {
   title?: string
@@ -28,6 +30,12 @@ const canonical = new URL(u(path), Astro.site).href
 
 const isOn = (href: string) => (href === '/' ? active === '/' : active === href || active.startsWith(href))
 const navItems = config.nav.map((item) => ({ ...item, href: u(item.href), on: isOn(item.href) }))
+
+/**
+ * 背景圆盘用的照片。不能在 CSS 里写 url('../assets/abyss.jpg')：
+ * 那张图被 astro:assets 接管后 Vite 只输出优化过的 webp，CSS 里的原图路径会 404。
+ */
+const discImg = await getImage({ src: abyss, width: 1000, format: 'webp' })
 ---
 
 <!doctype html>
@@ -67,10 +75,15 @@ const navItems = config.nav.map((item) => ({ ...item, href: u(item.href), on: is
   </head>
 
   <body class={bodyClass} data-posts={postsCount}>
-    <div class="sea" aria-hidden="true">
+    <div class="sea" style={`--sea-disc-img: url('${discImg.src}')`} aria-hidden="true">
       <div class="sea-rays"></div>
       <div class="sea-vignette"></div>
       <div class="sea-grain"></div>
+    </div>
+
+    <!-- P3R 菜单那种出血到画面外的巨型裁切字母，当水印用 -->
+    <div class="glyphs" aria-hidden="true">
+      <b>{config.latinTitle}</b>
     </div>
 
     <a class="skip" href="#main">跳到正文</a>
