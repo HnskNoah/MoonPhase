@@ -1629,14 +1629,6 @@ body.is-entering .veil i {
   filter: grayscale(1) contrast(1.28) brightness(1.18) sepia(1) hue-rotate(163deg) saturate(3.3);
   box-shadow: 0 40px 120px -40px rgba(11, 28, 61, 0.55);
 }
-/* 首页的圆盘留在右上，正文页不让它压到标题 */
-body.page-home .sea::after {
-  bottom: auto;
-  top: -26vh;
-  right: -22vw;
-  width: 60vw;
-  height: 60vw;
-}
 .sea-rays {
   background: repeating-linear-gradient(
     78deg,
