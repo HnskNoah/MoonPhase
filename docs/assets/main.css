@@ -31,6 +31,11 @@
   /* 导航选中态的旗标：填充不透明，描边才干净 */
   --flag-bg: #ffffff;
   --flag-ink: #b92812;
+  /* 转场圆盘 */
+  --veil-core: #1a4b96;
+  --veil-edge: #0b1c3d;
+  --veil-hi: rgba(53, 198, 245, 0.45);
+  --veil-ring: rgba(140, 220, 255, 0.85);
   --line: rgba(10, 18, 28, 0.14);
   --line-2: rgba(10, 18, 28, 0.5);
   --panel: #ffffff;
@@ -76,8 +81,13 @@
   --navy: #071322;
   --red: #ff5f45;
   --red-text: #ff8070;
-  --flag-bg: #eaf3fd;
-  --flag-ink: #8f1c08;
+  --flag-bg: #16233a;
+  --flag-ink: #ffd9d0;
+  /* 夜间转场要压暗，不能用亮青 */
+  --veil-core: #0d1c33;
+  --veil-edge: #04070a;
+  --veil-hi: rgba(53, 198, 245, 0.12);
+  --veil-ring: rgba(108, 196, 255, 0.34);
   --line: rgba(180, 215, 245, 0.14);
   --line-2: rgba(180, 215, 245, 0.42);
   --panel: rgba(12, 26, 43, 0.9);
@@ -223,11 +233,11 @@ img {
   height: 150vmax;
   margin: -75vmax 0 0 -75vmax;
   border-radius: 50%;
-  /* 转场球 = 涨大的满月：中间透出月亮，外圈用钴蓝盖住素材图的方边 */
+  /* 下潜：实心深蓝圆盘 + 边缘一圈涟漪，不放照片（方图压在圆上很难看） */
   background:
-    radial-gradient(circle at 50% 50%, rgba(11, 28, 61, 0) 30%, var(--cobalt) 64%),
-    url('moon.jpg') 50% 45% / 80vmax 80vmax no-repeat,
-    radial-gradient(circle at 50% 50%, var(--cyan), var(--cobalt) 78%);
+    radial-gradient(circle at 50% 50%, transparent 0 46.6%, var(--veil-ring) 46.6% 47.6%, transparent 47.6%),
+    radial-gradient(circle at 50% 38%, var(--veil-hi), transparent 58%),
+    radial-gradient(circle at 50% 50%, var(--veil-core) 0 42%, var(--veil-edge) 100%);
   transform: scale(0);
   transition: transform 0.5s var(--ease);
 }
@@ -1610,10 +1620,11 @@ body.is-entering .veil i {
   width: 48vw;
   height: 48vw;
   border-radius: 50%;
+  /* 和首页大图用同一张素材、同一套双色调，两处才对得上 */
   background:
-    radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.35), transparent 45%),
-    linear-gradient(165deg, rgba(47, 111, 216, 0.55) 0%, rgba(18, 44, 104, 0.82) 100%),
-    url('moon.jpg') 50% 42% / cover no-repeat;
+    radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.22), transparent 48%),
+    url('abyss.jpg') 50% 45% / cover no-repeat;
+  filter: grayscale(1) contrast(1.28) brightness(1.18) sepia(1) hue-rotate(163deg) saturate(3.3);
   box-shadow: 0 40px 120px -40px rgba(11, 28, 61, 0.55);
 }
 /* 首页的圆盘留在右上，正文页不让它压到标题 */
@@ -2262,6 +2273,10 @@ body.page-home .sea::after {
 }
 [data-theme='night'] .hero-img {
   filter: grayscale(1) contrast(1.22) brightness(0.82) sepia(1) hue-rotate(163deg) saturate(3.8);
+}
+/* 夜里的背景圆盘压暗，别和正文抢注意力 */
+[data-theme='night'] .sea::after {
+  filter: grayscale(1) contrast(1.18) brightness(0.46) sepia(1) hue-rotate(163deg) saturate(2.8);
 }
 [data-theme='night'] .nav-item:hover::before {
   background: rgba(53, 198, 245, 0.14);
