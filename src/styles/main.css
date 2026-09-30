@@ -396,6 +396,12 @@ img {
   color: var(--ink);
   transform: translateY(-2px);
 }
+.nb-text {
+  /* LIGHT 与 NIGHT 字形宽度不同，取一个能容纳两者的固定宽度，否则整组工具会左右跳 */
+  display: inline-block;
+  width: 10ch;
+  text-align: center;
+}
 .nb-disc {
   position: relative;
   width: 13px;
@@ -1628,11 +1634,11 @@ img {
 .sea::after {
   content: '';
   position: absolute;
-  right: -18vw;
-  bottom: -30vh;
+  right: -10vw;
+  bottom: -12vh;
   top: auto;
-  width: 48vw;
-  height: 48vw;
+  width: 62vw;
+  height: 62vw;
   border-radius: 50%;
   /* 和首页大图用同一张素材、同一套双色调，两处才对得上 */
   background:
