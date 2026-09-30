@@ -43,7 +43,7 @@
     // 品牌徽标与首页圆框共用同一个相位：位移按 SVG 用户单位换算（各自盘面直径）
     for (const [id, d] of [
       ['bm-shadow', 21],
-      ['hm-shadow', 32],
+      ['hp-shadow', 32],
     ]) {
       const el = document.getElementById(id)
       if (el) el.style.transform = `translateX(${((dir * shift) / 100) * d}px)`

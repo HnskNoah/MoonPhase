@@ -106,18 +106,11 @@
   </div>
   <div class="hero-panel">
   <div class="hero-frame">
-    <!-- 圆框里放品牌徽标的大号版本：相位阴影由 client.js 推动，与左上角同源 -->
-    <svg class="hero-moon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-      <defs>
-        <clipPath id="hm-clip"><circle cx="16" cy="16" r="16"/></clipPath>
-        <linearGradient id="hm-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop class="hm-stop-a" offset="0"/>
-          <stop class="hm-stop-b" offset="0.42"/>
-          <stop class="hm-stop-c" offset="1"/>
-        </linearGradient>
-      </defs>
-      <circle class="hm-disc" cx="16" cy="16" r="16" fill="url(#hm-sky)"/>
-      <g clip-path="url(#hm-clip)"><circle class="hm-shadow" id="hm-shadow" cx="16" cy="16" r="16"/></g>
+    <img class="hero-img" src="/assets/abyss.jpg" alt="深海与月光的抽象背景" width="1792" height="1024" fetchpriority="high">
+    <!-- 月相遮罩叠在照片上：multiply 混合，像明暗界线而不是黑咬一口 -->
+    <svg class="hero-phase" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <defs><clipPath id="hp-clip"><circle cx="16" cy="16" r="16"/></clipPath></defs>
+      <g clip-path="url(#hp-clip)"><circle class="hp-shadow" id="hp-shadow" cx="16" cy="16" r="16"/></g>
     </svg>
     <span class="hero-frame-edge" aria-hidden="true"></span>
   </div>
