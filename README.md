@@ -18,7 +18,7 @@ npm run build   # 生成 docs/
 content/posts/*.md   文章（frontmatter + Markdown）
 content/pages/*.md   独立页面（关于等）
 src/styles/main.css  全部样式与两套主题令牌
-src/client.js        月相 / 阅读进度 / Dark Hour 时钟 / 夜间模式 / 移动菜单 / 转场
+src/client.js        月相 / 阅读进度 / Dark Hour 时钟 / 夜间模式 / 移动菜单
 src/assets/          图片、图标
 build/               构建脚本与模板
 site.config.mjs      站点信息、导航、标签映射
@@ -78,14 +78,6 @@ draft: false
 
 形状相关的 `--panel-clip` / `--chip-radius` / `--arch-*` / `--flag` 也在 `:root` 里，改轮廓只动这里。
 
-## 跳转动画怎么实现的
-
-优先用浏览器原生的**跨文档 View Transitions**：`src/styles/main.css` 里 `@view-transition { navigation: auto }` 开启，新页面以 `clip-path: circle()` 从画面底部中央涨起（`@keyframes tide-in`，0.62s），旧页面静止垫在下面，所以没有淡入淡出的糊边。
-
-- 需要 Chromium 126+ / Safari 18.2+；`prefers-reduced-motion: reduce` 时整段禁用
-- 特性检测不能只看 `startViewTransition` 或 `CSS.supports('view-transition-name: none')`——那两个从 Chromium 111 就有，而跨文档的 `@view-transition` at-rule 要 126+，误判会导致「原生不跑、JS 兜底又被关掉」的无动画状态。`src/client.js` 的做法是把 at-rule 塞进一个临时 `<style>`，看 CSSOM 里有没有解析出 `CSSViewTransitionRule`
-- 不支持的浏览器（如 Firefox）回落到同方向的 `.veil` 水球，颜色走 `--veil-core / --veil-edge / --veil-hi / --veil-ring` 四个令牌，夜间模式自动压暗
-
 ## 部署到 GitHub Pages
 
 仓库名假设是 `blog`。先确认 `site.config.mjs` 里 `base: '/blog/'`（用户站点保持 `/`），然后二选一。
@@ -128,8 +120,8 @@ git push   # .github/workflows/deploy.yml 会 npm ci && npm run build && 发布 
 - 一套 P3R 界面语言 + 夜间模式：右上角 `NIGHT` 切换，记忆在 localStorage，首次访问跟随系统 `prefers-color-scheme`
 - 顶栏 Dark Hour 时钟，走到 0:00 会高亮提示
 - 左侧月相：跟随本地日期计算真实月相与亮度，同时是滚动进度条
-- 页面跳转：潮水从底部涨起的圆形揭示（View Transitions API），不支持的浏览器回落到同方向的 JS 水球
 - 整张卡片可点击（标题链接铺满卡片，标签与 READ 仍可单独点）
+- 页面跳转不做自定义转场：走浏览器原生导航（旧页面保持绘制到新页面就绪后一次性替换），少一层跨浏览器不一致
 - `prefers-reduced-motion` 降级、`:focus-visible` 可见、打印样式
 
 ## 常见问题

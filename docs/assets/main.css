@@ -33,11 +33,6 @@
   /* 导航选中态的旗标：填充不透明，描边才干净 */
   --flag-bg: #ffffff;
   --flag-ink: #b92812;
-  /* 转场圆盘 */
-  --veil-core: #1a4b96;
-  --veil-edge: #0b1c3d;
-  --veil-hi: rgba(53, 198, 245, 0.45);
-  --veil-ring: rgba(140, 220, 255, 0.85);
   /* 月食用的暗色：两套主题都要够暗，相位才看得清 */
   --eclipse: #0b1c33;
   --line: rgba(10, 18, 28, 0.14);
@@ -87,11 +82,6 @@
   --red-text: #ff8070;
   --flag-bg: #16233a;
   --flag-ink: #ffd9d0;
-  /* 夜间转场要压暗，不能用亮青 */
-  --veil-core: #0d1c33;
-  --veil-edge: #04070a;
-  --veil-hi: rgba(53, 198, 245, 0.12);
-  --veil-ring: rgba(108, 196, 255, 0.34);
   --eclipse: #04070a;
   --line: rgba(180, 215, 245, 0.14);
   --line-2: rgba(180, 215, 245, 0.42);
@@ -218,72 +208,6 @@ img {
   }
   to {
     transform: translateX(60px) rotate(-0.5deg);
-  }
-}
-
-/* ---------- 页面切换的水幕 ---------- */
-/* 转场：从中心扩散的水波 */
-.veil {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  pointer-events: none;
-  overflow: hidden;
-}
-.veil i {
-  position: absolute;
-  /* 兜底方案与原生转场同方向：从画面底部中央涨起 */
-  left: 50%;
-  top: 100%;
-  width: 260vmax;
-  height: 260vmax;
-  margin: -130vmax 0 0 -130vmax;
-  border-radius: 50%;
-  /* 下潜：实心深蓝圆盘 + 边缘一圈涟漪 */
-  background:
-    radial-gradient(circle at 50% 50%, transparent 0 46.6%, var(--veil-ring) 46.6% 47.6%, transparent 47.6%),
-    radial-gradient(circle at 50% 38%, var(--veil-hi), transparent 58%),
-    radial-gradient(circle at 50% 50%, var(--veil-core) 0 42%, var(--veil-edge) 100%);
-  transform: scale(0);
-  transition: transform 0.5s var(--ease);
-}
-body.is-leaving .veil i {
-  transform: scale(1);
-}
-body.is-entering .veil i {
-  transform: scale(0);
-}
-
-/* ---------- 跨文档转场：潮水从底部涨起（View Transitions API） ---------- */
-@view-transition {
-  navigation: auto;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  ::view-transition-image-pair(root) {
-    isolation: auto;
-  }
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
-    display: block;
-  }
-  ::view-transition-old(root) {
-    z-index: 1;
-  }
-  ::view-transition-new(root) {
-    z-index: 2;
-    animation: tide-in 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  }
-}
-
-@keyframes tide-in {
-  from {
-    clip-path: circle(0% at 50% 118%);
-  }
-  to {
-    clip-path: circle(240% at 50% 118%);
   }
 }
 
@@ -2508,8 +2432,7 @@ body.is-entering .veil i {
   .moon-progress,
   .site-foot,
   .toc,
-  .post-nav,
-  .veil {
+  .post-nav {
     display: none !important;
   }
   body {

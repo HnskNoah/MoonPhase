@@ -33,8 +33,6 @@
 
 <div class="glyphs" aria-hidden="true"><b>MOON PHASE</b></div>
 
-<div class="veil" aria-hidden="true"><i></i><i></i><i></i></div>
-
 <a class="skip" href="#main">跳到正文</a>
 
 <header class="site-head">
@@ -171,6 +169,15 @@
   </div>
 </footer>
 <script src="/assets/client.js" defer></script>
+
+<script>
+(function(){
+  if (!window.EventSource) return;
+  var es = new EventSource('/__livereload');
+  es.addEventListener('reload', function(){ es.close(); location.reload(); });
+  es.onerror = function(){ es.close(); };
+})();
+</script>
 
 </body>
 </html>

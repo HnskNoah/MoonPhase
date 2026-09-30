@@ -87,8 +87,6 @@ ${NIGHT_BOOTSTRAP}${head}
 
 <div class="glyphs" aria-hidden="true"><b>${escapeHtml(config.latinTitle)}</b></div>
 
-<div class="veil" aria-hidden="true"><i></i><i></i><i></i></div>
-
 <a class="skip" href="#main">跳到正文</a>
 
 <header class="site-head">

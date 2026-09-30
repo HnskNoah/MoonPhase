@@ -1,13 +1,12 @@
 /* ==========================================================================
    月相记录 · 客户端交互
-   月相与阅读进度 / Dark Hour 时钟 / 目录高亮 / 移动菜单 / 水波转场
+   月相与阅读进度 / Dark Hour 时钟 / 目录高亮 / 移动菜单
    ========================================================================== */
 ;(() => {
   'use strict'
 
   const root = document.documentElement
   const body = document.body
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   /* ---------- 月相 ---------- */
   const SYNODIC = 29.530588853
@@ -170,51 +169,6 @@
       .forEach((a) => a.addEventListener('click', () => body.classList.remove('nav-open')))
   }
 
-  /* ---------- 转场 ---------- */
-  /**
-   * 跨文档 @view-transition at-rule 需要 Chromium 126+ / Safari 18.2+，而
-   * startViewTransition 和 view-transition-name 早在 111 就有 —— 用它们判断会误报
-   * 「原生可用」，结果原生不跑、JS 兜底又被关掉，跳转变没动画。直接探测 at-rule。
-   */
-  function supportsCrossDocVT() {
-    try {
-      const probe = document.createElement('style')
-      probe.textContent = '@view-transition { navigation: auto }'
-      document.head.appendChild(probe)
-      const ok = [...probe.sheet.cssRules].some((r) => r.constructor.name === 'CSSViewTransitionRule')
-      probe.remove()
-      return ok
-    } catch {
-      return false
-    }
-  }
-
-  const nativeTide = supportsCrossDocVT()
-
-  function initVeil() {
-    if (reduced || nativeTide) return
-    document.querySelectorAll('a[href]').forEach((a) => {
-      if (a.target || a.hasAttribute('download')) return
-      const href = a.getAttribute('href')
-      if (!href || href.startsWith('#') || href.startsWith('mailto:') || !href.startsWith('/')) return
-      if (a.classList.contains('heading-anchor') || a.classList.contains('skip')) return
-      a.addEventListener('click', (ev) => {
-        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return
-        ev.preventDefault()
-        body.classList.add('is-leaving')
-        setTimeout(() => {
-          window.location.href = href
-        }, 300)
-      })
-    })
-    if (sessionStorage.getItem('p3-enter') === '1') {
-      body.classList.add('is-entering')
-      setTimeout(() => body.classList.remove('is-entering'), 620)
-    }
-    addEventListener('pageshow', () => sessionStorage.setItem('p3-enter', '1'))
-    addEventListener('pagehide', () => body.classList.remove('is-leaving'))
-  }
-
   /* ---------- boot ---------- */
   function boot() {
     initClock()
@@ -222,7 +176,6 @@
     initMenu()
     initProgress()
     initTocSpy()
-    initVeil()
     paintMoon()
     body.classList.add('is-ready')
   }
