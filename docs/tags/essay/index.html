@@ -141,14 +141,5 @@
 </footer>
 <script src="/assets/client.js" defer></script>
 
-<script>
-(function(){
-  if (!window.EventSource) return;
-  var es = new EventSource('/__livereload');
-  es.addEventListener('reload', function(){ es.close(); location.reload(); });
-  es.onerror = function(){ es.close(); };
-})();
-</script>
-
 </body>
 </html>

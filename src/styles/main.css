@@ -28,6 +28,9 @@
   --navy: #0b1c3d;
   --red: #e8402a;
   --red-text: #c22c16;
+  /* 导航选中态的旗标：填充不透明，描边才干净 */
+  --flag-bg: #ffffff;
+  --flag-ink: #b92812;
   --line: rgba(10, 18, 28, 0.14);
   --line-2: rgba(10, 18, 28, 0.5);
   --panel: #ffffff;
@@ -73,6 +76,8 @@
   --navy: #071322;
   --red: #ff5f45;
   --red-text: #ff8070;
+  --flag-bg: #eaf3fd;
+  --flag-ink: #8f1c08;
   --line: rgba(180, 215, 245, 0.14);
   --line-2: rgba(180, 215, 245, 0.42);
   --panel: rgba(12, 26, 43, 0.9);
@@ -1702,17 +1707,21 @@ body.page-home .sea::after {
 .nav-item:hover::before {
   opacity: 1;
 }
+/* 悬停只加淡底，文字保持主色，否则白字压在浅底上会消失 */
+.nav-item:hover .nav-label {
+  color: var(--ink);
+}
+/* 选中态 = 不透明旗标底 + 红字 + 红描边（填充必须不透明，否则四层 drop-shadow 会糊成一块） */
 .nav-item.is-on::before {
-  background: var(--plate);
+  background: var(--flag-bg);
   opacity: 1;
 }
-/* 选中态 = 白底 + 红字 + 品红描边（drop-shadow 会跟随 clip-path） */
 .nav-item.is-on {
   filter: drop-shadow(2px 0 0 var(--red)) drop-shadow(-2px 0 0 var(--red)) drop-shadow(0 2px 0 var(--red))
     drop-shadow(0 -2px 0 var(--red));
 }
 .nav-item.is-on .nav-label {
-  color: var(--red-text);
+  color: var(--flag-ink);
 }
 
 .dark-clock {
@@ -2248,7 +2257,7 @@ body.page-home .sea::after {
 [data-theme='night'] .hero-img {
   filter: grayscale(1) contrast(1.22) brightness(0.82) sepia(1) hue-rotate(163deg) saturate(3.8);
 }
-[data-theme='night'] .nav-item::before {
+[data-theme='night'] .nav-item:hover::before {
   background: rgba(53, 198, 245, 0.14);
 }
 [data-theme='night'] .site-nav {
@@ -2333,8 +2342,26 @@ body.page-home .sea::after {
       visibility 0s;
   }
   .nav-item {
-    border-bottom: 1px solid var(--line);
+    /* 抽屉里不用撕纸旗标：斜切 + 多层描边在小屏上会糊成一片 */
     clip-path: none;
+    border-radius: 0;
+    border-bottom: 1px solid var(--line-2);
+    padding: 15px 14px;
+    margin: 0;
+  }
+  .nav-item:last-child {
+    border-bottom: 0;
+  }
+  .nav-item .nav-label {
+    font-size: 17px;
+  }
+  .nav-item.is-on {
+    filter: none;
+    background: var(--flag-bg);
+    box-shadow: inset 6px 0 0 var(--red);
+  }
+  .nav-item.is-on .nav-label {
+    color: var(--flag-ink);
   }
   .card {
     grid-template-columns: minmax(0, 1fr);
