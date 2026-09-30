@@ -171,9 +171,25 @@
   }
 
   /* ---------- 转场 ---------- */
-  // 支持跨文档 View Transitions 的浏览器由 CSS 的 tide-in 接管，不再手动拦截链接
-  const nativeTide =
-    'startViewTransition' in document && !!(window.CSS && CSS.supports && CSS.supports('view-transition-name: none'))
+  /**
+   * 跨文档 @view-transition at-rule 需要 Chromium 126+ / Safari 18.2+，而
+   * startViewTransition 和 view-transition-name 早在 111 就有 —— 用它们判断会误报
+   * 「原生可用」，结果原生不跑、JS 兜底又被关掉，跳转变没动画。直接探测 at-rule。
+   */
+  function supportsCrossDocVT() {
+    try {
+      const probe = document.createElement('style')
+      probe.textContent = '@view-transition { navigation: auto }'
+      document.head.appendChild(probe)
+      const ok = [...probe.sheet.cssRules].some((r) => r.constructor.name === 'CSSViewTransitionRule')
+      probe.remove()
+      return ok
+    } catch {
+      return false
+    }
+  }
+
+  const nativeTide = supportsCrossDocVT()
 
   function initVeil() {
     if (reduced || nativeTide) return

@@ -83,8 +83,8 @@ draft: false
 优先用浏览器原生的**跨文档 View Transitions**：`src/styles/main.css` 里 `@view-transition { navigation: auto }` 开启，新页面以 `clip-path: circle()` 从画面底部中央涨起（`@keyframes tide-in`，0.62s），旧页面静止垫在下面，所以没有淡入淡出的糊边。
 
 - 需要 Chromium 126+ / Safari 18.2+；`prefers-reduced-motion: reduce` 时整段禁用
-- 检测到手时（`'startViewTransition' in document && CSS.supports('view-transition-name: none')`），`src/client.js` 会**跳过**自己的链接拦截，避免两套动画打架
-- 不支持的浏览器（如 Firefox）回落到 `.veil` 那颗水球：同样从底部中央涨起，颜色走 `--veil-core / --veil-edge / --veil-hi / --veil-ring` 四个令牌，夜间模式自动压暗
+- 特性检测不能只看 `startViewTransition` 或 `CSS.supports('view-transition-name: none')`——那两个从 Chromium 111 就有，而跨文档的 `@view-transition` at-rule 要 126+，误判会导致「原生不跑、JS 兜底又被关掉」的无动画状态。`src/client.js` 的做法是把 at-rule 塞进一个临时 `<style>`，看 CSSOM 里有没有解析出 `CSSViewTransitionRule`
+- 不支持的浏览器（如 Firefox）回落到同方向的 `.veil` 水球，颜色走 `--veil-core / --veil-edge / --veil-hi / --veil-ring` 四个令牌，夜间模式自动压暗
 
 ## 部署到 GitHub Pages
 
