@@ -230,7 +230,9 @@ img {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 0 0 auto;
+  /* 可收缩：窄屏下让标题自己省略号，而不是把右边的工具组挤出屏幕 */
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 /* 品牌徽标：月相盘 + 外环 + 一道涟漪，阴影位置由 JS 按真实月相推动 */
@@ -281,10 +283,14 @@ img {
   display: flex;
   flex-direction: column;
   line-height: 1;
+  min-width: 0;
 }
 .brand-text b {
   font: 400 clamp(19px, 2.4vw, 25px)/1 var(--font-display);
   letter-spacing: 0.12em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .brand-text i {
   font-style: normal;
@@ -396,11 +402,26 @@ img {
   color: var(--ink);
   transform: translateY(-2px);
 }
-.nb-text {
-  /* LIGHT 与 NIGHT 字形宽度不同，取一个能容纳两者的固定宽度，否则整组工具会左右跳 */
-  display: inline-block;
-  width: 10ch;
+.nb-label {
+  /* LIGHT 与 NIGHT 字形宽度不同，切换时按钮宽度会变、整组工具左右跳。
+     把两个标签叠进同一个格子，宽度恒等于较宽的那个，既不用预留固定空白也不跳。
+     用 visibility 而不是 display：隐藏的那个仍然参与撑宽。 */
+  display: grid;
+}
+.nb-label > span {
+  grid-area: 1 / 1;
   text-align: center;
+  visibility: hidden;
+}
+/* 选择器和上面的 .nb-label > span 保持同一特异性，否则盖不住它 */
+.nb-label > .nb-light {
+  visibility: visible;
+}
+[data-theme='night'] .nb-label > .nb-light {
+  visibility: hidden;
+}
+[data-theme='night'] .nb-label > .nb-night {
+  visibility: visible;
 }
 .nb-disc {
   position: relative;
@@ -500,7 +521,8 @@ img {
 .site-main {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: clamp(28px, 6vw, 74px) var(--pad) clamp(60px, 10vw, 120px);
+  /* 底部留白只在这里控制：页脚带和最后一个区块之间不再叠加 margin */
+  padding: clamp(28px, 6vw, 74px) var(--pad) clamp(36px, 6vw, 60px);
 }
 
 .kicker {
@@ -825,6 +847,9 @@ img {
 /* ---------- 区块 ---------- */
 .section {
   margin-bottom: clamp(44px, 8vw, 88px);
+}
+.section:last-child {
+  margin-bottom: 0;
 }
 .section-head {
   display: flex;
@@ -1564,7 +1589,6 @@ img {
 /* ---------- 页脚 ---------- */
 .site-foot {
   position: relative;
-  margin-top: clamp(40px, 8vw, 90px);
   padding: 46px var(--pad) 60px;
   border-top: 1px solid var(--line);
   background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.6));
@@ -2446,6 +2470,32 @@ img {
   }
   .brand-text b {
     font-size: 18px;
+  }
+}
+/* 手机宽度：品牌 + MENU + NIGHT 一行放不下，把三块都收紧密度 */
+@media (max-width: 470px) {
+  .site-head {
+    gap: 6px;
+    padding-inline: 14px;
+  }
+  .brand {
+    gap: 9px;
+  }
+  .brand-text b {
+    font-size: 15px;
+    letter-spacing: 0.03em;
+  }
+  .head-tools {
+    gap: 6px;
+  }
+  .night-btn {
+    gap: 6px;
+    padding: 7px 10px;
+  }
+  .menu-btn {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    padding: 7px 9px;
   }
 }
 

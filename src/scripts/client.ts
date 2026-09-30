@@ -82,8 +82,6 @@ function syncNightBtn(): void {
   if (!(btn instanceof HTMLButtonElement)) return
   btn.setAttribute('aria-pressed', String(isNight()))
   btn.title = isNight() ? '当前：夜间模式' : '当前：浅色模式'
-  const text = btn.querySelector('.nb-text')
-  if (text) text.textContent = isNight() ? 'NIGHT' : 'LIGHT'
 }
 
 function initNight(): void {
