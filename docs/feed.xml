@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>月相记录</title>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>一个女神异闻录3风格的个人博客：技术、设计与生活记录。在 0:00 之后，把想法沉入水底再看清一次。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 30 Sep 2026 07:10:13 GMT</lastBuildDate>
+    <item>
+      <title>0:00 之后的第十二个小时</title>
+      <link>/posts/001-dark-hour/</link>
+      <guid isPermaLink="true">/posts/001-dark-hour/</guid>
+      <pubDate>Mon, 28 Sep 2026 00:00:00 GMT</pubDate>
+      <description>一天里最诚实的时间不属于 24 小时制。写下第一条记录之前，先说清楚这个博客为什么存在。</description>
+    </item>
+    <item>
+      <title>把截止日期写进标题里</title>
+      <link>/posts/002-memento-mori/</link>
+      <guid isPermaLink="true">/posts/002-memento-mori/</guid>
+      <pubDate>Mon, 21 Sep 2026 00:00:00 GMT</pubDate>
+      <description>「记住终将逝去的东西」不是丧，是一种极其有效的时间管理方法。聊聊这个短语是怎么变成界面语言的。</description>
+    </item>
+    <item>
+      <title>水下的界面：为什么 P3R 的蓝是对的</title>
+      <link>/posts/003-blue-water-ui/</link>
+      <guid isPermaLink="true">/posts/003-blue-water-ui/</guid>
+      <pubDate>Sat, 12 Sep 2026 00:00:00 GMT</pubDate>
+      <description>重制版的菜单不是被画出来的，是被「泡」出来的。拆解几个可以直接抄走的界面手法。</description>
+    </item>
+    <item>
+      <title>用 90 行脚本换掉了整个静态生成器</title>
+      <link>/posts/004-build-retro/</link>
+      <guid isPermaLink="true">/posts/004-build-retro/</guid>
+      <pubDate>Sun, 30 Aug 2026 00:00:00 GMT</pubDate>
+      <description>一次以「能跑在 GitHub Pages 上」为唯一目标的重构：去掉构建依赖之后，我得到了什么，又赔进去了什么。</description>
+    </item>
+    <item>
+      <title>月相观测记录 · 八月</title>
+      <link>/posts/005-log-august/</link>
+      <guid isPermaLink="true">/posts/005-log-august/</guid>
+      <pubDate>Fri, 14 Aug 2026 00:00:00 GMT</pubDate>
+      <description>一些不够资格成为文章的东西：读过的书、跑通的代码、以及八月里三次抬头看月亮的时刻。</description>
+    </item>
+    <item>
+      <title>读《慢生产力》：长期主义的两件小事</title>
+      <link>/posts/006-reading-longterm/</link>
+      <guid isPermaLink="true">/posts/006-reading-longterm/</guid>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 GMT</pubDate>
+      <description>一本讲 how to accomplish more by working less 的书，最有用的部分反而不是效率。摘两条能马上用的，和一条我拒绝用的。</description>
+    </item>
+  </channel>
+</rss>

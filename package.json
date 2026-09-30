@@ -1,0 +1,23 @@
+{
+  "name": "memento-mori-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "女神异闻录3 风格的个人博客，纯静态构建，部署到 GitHub Pages 的 docs/ 目录",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node build/dev.mjs",
+    "build": "node build/build.mjs",
+    "format": "prettier --write content src/client.js src/styles site.config.mjs",
+    "serve": "node build/dev.mjs"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^12.0.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}
