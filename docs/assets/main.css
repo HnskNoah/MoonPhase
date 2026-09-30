@@ -223,7 +223,11 @@ img {
   height: 150vmax;
   margin: -75vmax 0 0 -75vmax;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, var(--cyan), var(--cobalt) 70%);
+  /* 转场球 = 涨大的满月：中间透出月亮，外圈用钴蓝盖住素材图的方边 */
+  background:
+    radial-gradient(circle at 50% 50%, rgba(11, 28, 61, 0) 30%, var(--cobalt) 64%),
+    url('moon.jpg') 50% 45% / 80vmax 80vmax no-repeat,
+    radial-gradient(circle at 50% 50%, var(--cyan), var(--cobalt) 78%);
   transform: scale(0);
   transition: transform 0.5s var(--ease);
 }
@@ -1608,7 +1612,8 @@ body.is-entering .veil i {
   border-radius: 50%;
   background:
     radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.35), transparent 45%),
-    linear-gradient(165deg, #2f6fd8 0%, var(--bg-2) 45%, var(--cobalt) 100%);
+    linear-gradient(165deg, rgba(47, 111, 216, 0.55) 0%, rgba(18, 44, 104, 0.82) 100%),
+    url('moon.jpg') 50% 42% / cover no-repeat;
   box-shadow: 0 40px 120px -40px rgba(11, 28, 61, 0.55);
 }
 /* 首页的圆盘留在右上，正文页不让它压到标题 */
@@ -1673,7 +1678,8 @@ body.page-home .sea::after {
   color: var(--ink-2);
 }
 .brand-moon {
-  background: radial-gradient(circle at 34% 30%, #fff, var(--cyan) 42%, var(--cobalt) 100%);
+  /* 水面下的满月：品牌图标直接用素材图，小尺寸下比渐变更像东西 */
+  background: url('moon.jpg') 50% 45% / cover no-repeat;
   box-shadow: 0 0 0 2px var(--ink);
 }
 .brand-moon::after {
@@ -2398,6 +2404,17 @@ body.page-home .sea::after {
   }
   .dark-clock {
     display: none;
+  }
+  /* 手机上 NIGHT 收到最右边，MENU 让到它左边 */
+  /* 导航变 fixed 后没人撑开了，工具组自己贴右 */
+  .head-tools {
+    margin-left: auto;
+  }
+  .menu-btn {
+    order: 1;
+  }
+  .night-btn {
+    order: 2;
   }
   .brand-text i {
     display: none;
