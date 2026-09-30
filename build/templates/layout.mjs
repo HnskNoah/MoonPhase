@@ -93,7 +93,19 @@ ${NIGHT_BOOTSTRAP}${head}
 
 <header class="site-head">
   <a class="brand" href="${url('/')}">
-    <span class="brand-moon" aria-hidden="true"></span>
+    <svg class="brand-moon" id="brand-moon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <defs>
+        <clipPath id="bm-clip"><circle cx="16" cy="16" r="10.5"/></clipPath>
+        <linearGradient id="bm-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop class="bm-stop-a" offset="0"/>
+          <stop class="bm-stop-b" offset="1"/>
+        </linearGradient>
+      </defs>
+      <circle class="bm-ring" cx="16" cy="16" r="14.6"/>
+      <circle class="bm-disc" cx="16" cy="16" r="10.5" fill="url(#bm-sky)"/>
+      <g clip-path="url(#bm-clip)"><circle class="bm-shadow" id="bm-shadow" cx="16" cy="16" r="10.5"/></g>
+      <path class="bm-ripple" d="M6.5 28.4c2.6-1.4 4.6.9 7-.4"/>
+    </svg>
     <span class="brand-text">
       <b>${escapeHtml(config.latinTitle)}</b>
       <i>${escapeHtml(config.title)}</i>

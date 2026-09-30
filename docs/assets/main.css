@@ -38,6 +38,8 @@
   --veil-edge: #0b1c3d;
   --veil-hi: rgba(53, 198, 245, 0.45);
   --veil-ring: rgba(140, 220, 255, 0.85);
+  /* 月食用的暗色：两套主题都要够暗，相位才看得清 */
+  --eclipse: #0b1c33;
   --line: rgba(10, 18, 28, 0.14);
   --line-2: rgba(10, 18, 28, 0.5);
   --panel: #ffffff;
@@ -90,6 +92,7 @@
   --veil-edge: #04070a;
   --veil-hi: rgba(53, 198, 245, 0.12);
   --veil-ring: rgba(108, 196, 255, 0.34);
+  --eclipse: #04070a;
   --line: rgba(180, 215, 245, 0.14);
   --line-2: rgba(180, 215, 245, 0.42);
   --panel: rgba(12, 26, 43, 0.9);
@@ -272,23 +275,35 @@ body.is-entering .veil i {
   flex: 0 0 auto;
 }
 
+/* 品牌徽标：月相盘 + 外环 + 一道涟漪，阴影位置由 JS 按真实月相推动 */
 .brand-moon {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 32%, #fff, var(--accent) 46%, var(--accent-2) 100%);
-  box-shadow:
-    0 0 18px var(--sea-1),
-    inset -6px -4px 10px rgba(0, 0, 0, 0.55);
-  position: relative;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  overflow: visible;
+  filter: drop-shadow(0 0 10px var(--sea-1));
 }
-.brand-moon::after {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  border-radius: 50%;
-  border: 1px solid var(--line-2);
-  clip-path: inset(0 0 50% 0);
+.bm-ring {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 1.5;
+}
+.bm-stop-a {
+  stop-color: #ffffff;
+}
+.bm-stop-b {
+  stop-color: var(--cobalt);
+}
+.bm-shadow {
+  fill: var(--eclipse);
+  transition: transform 0.7s var(--ease);
+}
+.bm-ripple {
+  fill: none;
+  stroke: var(--accent-2);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0.9;
 }
 
 .brand-text {
@@ -487,7 +502,7 @@ body.is-entering .veil i {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--bg-0);
+  background: var(--eclipse);
   transform: translateX(calc(-1% * var(--moon, 100)));
 }
 .mp-track {
@@ -1682,15 +1697,6 @@ body.is-entering .veil i {
 .brand-text i {
   color: var(--ink-2);
 }
-.brand-moon {
-  /* 水面下的满月：品牌图标直接用素材图，小尺寸下比渐变更像东西 */
-  background: url('moon.jpg') 50% 45% / cover no-repeat;
-  box-shadow: 0 0 0 2px var(--ink);
-}
-.brand-moon::after {
-  display: none;
-}
-
 .nav-item {
   clip-path: var(--flag);
   border-radius: 0;
@@ -1764,9 +1770,6 @@ body.is-entering .veil i {
 .moon-disc {
   background: radial-gradient(circle at 34% 30%, #fff, var(--cyan) 45%, var(--cobalt) 100%);
   box-shadow: 0 0 0 1.5px var(--ink);
-}
-.moon-shadow {
-  background: rgba(255, 255, 255, 0.86);
 }
 .mp-track {
   background: var(--line);
@@ -2263,9 +2266,6 @@ body.is-entering .veil i {
 }
 [data-theme='night'] .site-head {
   background: rgba(5, 13, 24, 0.9);
-}
-[data-theme='night'] .moon-shadow {
-  background: rgba(5, 13, 24, 0.94);
 }
 [data-theme='night'] .hero-img {
   filter: grayscale(1) contrast(1.22) brightness(0.82) sepia(1) hue-rotate(163deg) saturate(3.8);

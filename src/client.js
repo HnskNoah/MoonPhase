@@ -35,9 +35,14 @@
   function paintMoon() {
     const m = moonPhase()
     // 阴影偏移：p=0.5（满月）时完全移出
-    const shift = (m.p <= 0.5 ? m.p * 200 : (1 - m.p) * 200).toFixed(1)
+    const shift = m.p <= 0.5 ? m.p * 200 : (1 - m.p) * 200
+    const dir = m.p < 0.5 ? 1 : -1
     const shadow = document.querySelector('.moon-shadow')
-    if (shadow) shadow.style.transform = m.p < 0.5 ? `translateX(${shift}%)` : `translateX(-${shift}%)`
+    if (shadow) shadow.style.transform = `translateX(${dir * shift}%)`
+
+    // 品牌徽标共用同一个相位：位移按 SVG 用户单位换算（盘面直径 21）
+    const bm = document.getElementById('bm-shadow')
+    if (bm) bm.style.transform = `translateX(${((dir * shift) / 100) * 21}px)`
 
     const nameEl = document.querySelector('.moon-name')
     if (nameEl) nameEl.textContent = `${m.name} · ${m.illum}%`

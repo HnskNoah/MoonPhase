@@ -1,17 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="月相">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="月相">
   <defs>
-    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0a2c4d"/>
-      <stop offset="1" stop-color="#020a12"/>
-    </linearGradient>
-    <radialGradient id="moon" cx=".36" cy=".32" r=".8">
+    <clipPath id="c"><circle cx="16" cy="16" r="10.5"/></clipPath>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset=".55" stop-color="#4fcbff"/>
-      <stop offset="1" stop-color="#1a76bd"/>
-    </radialGradient>
+      <stop offset="1" stop-color="#122c68"/>
+    </linearGradient>
   </defs>
-  <path d="M0 14 14 0h50v50L50 64H0z" fill="url(#sea)"/>
-  <circle cx="32" cy="31" r="17" fill="url(#moon)"/>
-  <circle cx="42" cy="26" r="15" fill="#04101d" opacity=".92"/>
-  <path d="M6 55h52" stroke="#4fcbff" stroke-width="2" opacity=".55"/>
+  <rect width="32" height="32" rx="7" fill="#04101d"/>
+  <circle cx="16" cy="16" r="14.6" fill="none" stroke="#35c6f5" stroke-width="1.4" opacity=".5"/>
+  <circle cx="16" cy="16" r="10.5" fill="url(#g)"/>
+  <g clip-path="url(#c)"><circle cx="2.5" cy="16" r="10.5" fill="#04101d"/></g>
+  <path d="M6.5 28.4c2.6-1.4 4.6.9 7-.4" fill="none" stroke="#35c6f5" stroke-width="1.6" stroke-linecap="round"/>
 </svg>
