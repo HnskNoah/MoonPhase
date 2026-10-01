@@ -40,7 +40,7 @@ src/components/             Hero / Feature / PostList / PostCard / PageHead / Ar
 src/pages/                  路由，见下表
 src/scripts/client.ts       浏览器侧：月相 / 阅读进度 / Dark Hour 时钟 / 夜间开关 / 目录高亮 / 移动菜单
 src/styles/main.css         前段骨架（尺寸布局动效）+ 后段皮肤（颜色描边阴影切角），同一属性不重复
-src/assets/abyss.jpg        首页圆框与背景圆盘共用的原图，交给 astro:assets 出多档 WebP
+src/assets/abyss.jpg        首页纸牌上的照片与背景圆盘共用同一张原图，交给 astro:assets 出多档 WebP
 public/                     原样拷贝：assets/favicon.svg、.nojekyll
 .github/workflows/deploy.yml  npm ci → astro check → build → 把 dist/ 作为 Pages 产物
 ```
@@ -124,20 +124,20 @@ BASE_PATH=/MoonPhase SITE_ORIGIN=https://hnsknoah.github.io npm run build
 | `--eclipse`                        | 月食缺口的暗色   | `#0b1c33`                | `#04070a`                   |
 | `--ink-link` / `--red-text`        | 纸面上的强调文字 | `#122c68` / `#c22c16`    | `#7cc0ff` / `#ff8070`       |
 
-形状令牌（`--flag`、`--panel-clip`、`--chip-radius` 等）也在 `:root`，改轮廓只动那里。
+形状令牌（`--flag`、`--flag-inner`、`--chip-clip`、`--chip-radius`、首页纸牌的 `--punch`）也在 `:root` 或组件规则里，改轮廓只动那里。
 
 主题选择在 localStorage（键 `p3-night`），首次访问跟随系统 `prefers-color-scheme`；`<head>` 里有一段内联脚本在绘制前落 `data-theme`，避免闪白。
 
 ## 已实现的东西
 
-- 首页（Hero + 重点记录 + 最近五条 + 引言块）
+- 首页（Hero：左侧文字 + 右侧一张微微旋转的纸牌照片 + 三条读数，下面接重点记录、最近五条、引言块）
 - 文章页：目录侧栏、滚动高亮、上一篇/下一篇、阅读时长、标题锚点
 - 归档页按年分组并分页（每页 30），标签墙与标签页同样分页（每页 20）
 - 关于页、404 页
 - RSS (`/rss.xml`)、`sitemap-index.xml`、robots
-- 图片管线：首页圆框的头图由 `astro:assets` 出 4 档 WebP（`quality={90}`，93KB 原图 → 22/36/52/74KB）并写进 `srcset`；背景那层大圆盘单独取 1000w
+- 图片管线：首页纸牌的照片按原生 16:11 由 `astro:assets` 出 3 档 WebP（`quality={90}`，93KB 原图 → 22/36/52KB）并写进 `srcset`；背景那层大圆盘单独取 1000w
+- 左侧月相轨与左上角徽标共用同一个相位计算（`client.ts` 的 `paintMoon()`）：两处都是填 `--eclipse` 暗色的缺口，不是镂空
 - 顶栏 Dark Hour 时钟，走到 0:00 会高亮提示
-- 左侧月相轨：按本地日期算真实月相与亮度，同时是滚动进度条；左上角徽标和首页圆框共用同一个计算。圆框的缺口是**镂空**而不是黑遮罩：`.hero-img` 用 `mask-image: radial-gradient(50% 50% at var(--bite-x) 50%, …)` 把照片啃掉一块，`--bite-x` 由 `client.ts` 写入，`.hero-frame` 的背景是透明的，所以缺口直接透出 `.sea` 那层背景
 - 整张卡片可点击（标题链接铺满卡片，标签与 READ 仍可单独点）
 - 页面跳转不做自定义转场：走浏览器原生导航，少一层跨浏览器不一致
 - `prefers-reduced-motion` 降级、`:focus-visible` 可见、打印样式
@@ -150,7 +150,14 @@ BASE_PATH=/MoonPhase SITE_ORIGIN=https://hnsknoah.github.io npm run build
 
 **月相侧栏看不见。** 窗口宽度小于 1320px 时隐藏，属于设计决定。
 
-**圆框图糊。** 两条来路，别再踩回去：一是动效，`@keyframes sink` 用 `object-position` 挪取景窗，**不要改回 `transform: scale`**——那是把裁好的栅格再放大 4~11%。二是取景比例，圆框是 1:1 而原图 1792×1024，`object-fit: cover` 永远只看得见中间那条 1024px 高的横条，所以 2× 屏上框一旦超过约 512 CSS px 就会开始糊，多加 `srcset` 档位救不了，只能换更高或接近正方形的原图、或者压小框。`sizes` 也因此按「框宽 ×1.75」写（`(max-width: 900px) 161vw, 860px`），照框宽本身写会让浏览器挑小图。
+**首页右栏（纸牌）改起来注意四件事。**
+
+- 照片按**原生 16:11** 印，不要为了形状去裁它。之前它是 1:1 圆框，`object-fit: cover` 只能取原图 1792×1024 中间那条 1024px 高的横条，2× 屏上框一超过约 512 CSS px 就必糊，多加 `srcset` 档位救不回来 —— 现在的糊法源头已经拿掉。
+- 浮游动效**不要改回 `transform: scale`**：那是把裁好的栅格再放大，之前 1.04→1.11 的范围等于凭空损失 11% 分辨率。
+- `<img>` 上的 `height` 属性和 CSS `aspect-ratio` 会打架：两个维度都确定时 `aspect-ratio` 被直接忽略，图会按属性里的像素高铺开。`.hero-paper img` 里那句 `height: auto` 不能省。
+- `<figure>` 有浏览器默认 `margin: 16px 40px`，不归零会凭空削掉 80px 宽。
+
+穿孔（`--punch: 12cqi`）用的是容器查询单位而不是百分比：纸不是正方形，百分比半径会变成椭圆；固定 px 又会在窄屏压到右下题注、在宽屏比例失衡。**容器 `container-type: inline-size` 必须开在父级 `.hero-panel` 上**——开在 `.hero-paper` 自己身上的话，`cqi` 在同一元素里取不到容器尺寸（规范为避免循环会退回视口单位），实测会等于 12% 视口宽，桌面下洞能占到纸宽 63%。开在父级后两个半径同取 cqi 既是正圆又恒占纸宽 24%（320~1440 逐档量过：23~24%，左缘留 12~35px、下缘留 14~27px、不碰题注）。
 
 **代码块颜色不跟着夜间模式变。** `astro.config.ts` 配的是 `shikiConfig.themes: { light, dark }`，浅色值直接写进 `style="color:…"`，暗色值只挂在 `--shiki-dark` 上；Astro 在这种情况下不输出任何切换样式表，所以 `main.css` 里用 `[data-theme='night'] .prose pre span { color: var(--shiki-dark) !important }` 接管。换主题名只改 config 那两个字符串，别在 CSS 里写死色值。
 

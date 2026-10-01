@@ -12,10 +12,6 @@
   --flag-inner: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
   --chip-clip: none;
   --chip-radius: 999px;
-  --panel-clip: none;
-  --panel-radius: 0px;
-  --arch-clip: none;
-  --arch-radius: 0px;
 
   --bg-0: #edf2f9;
   --bg-1: #ffffff;
@@ -639,52 +635,52 @@ img {
 
 .hero-panel {
   position: relative;
+  /* 容器要开在父级：cqi 在声明 container-type 的那个元素自己身上取不到容器尺寸
+     （规范为避免循环会退回视口单位），写在 .hero-paper 里就等于 vw 而不是纸宽 */
+  container-type: inline-size;
 }
-.hero-frame {
+/* 首页右栏是一张微微旋转的纸牌：照片按原生 16:11 印在上面，
+   月相是纸上的一处穿孔（透出背后的海面），不是盖在图上的效果 */
+.hero-paper {
+  /* 穿孔半径按纸自身的宽度算（cqi = 容器 .hero-panel 内联方向的 1%，纸牌铺满它）：
+     固定 px 在窄屏会压到右下题注、在宽屏比例失衡；而百分比半径在非正方形的纸上会变成椭圆。
+     两个半径同取 cqi 才是正圆，且恒占纸宽 24% */
+  --punch: 12cqi;
   position: relative;
-  overflow: hidden;
-  /* 透明：月相缺口是照片上的洞，洞后面要直接是 .sea 那层背景，
-     这里铺一块板子就把「啃掉」又变回「盖住」了 */
-  background: transparent;
-  /* 月相缺口：--bite-x 由 client.ts 按真实相位写入，缺口半径恒等于盘面半径。
-     方框里 50% 50% 就是半径等于半边宽的正圆；别写成 `circle 50%` ——
-     圆的百分比半径非法，整条声明会被丢掉、mask 静默变回 none。
-     150% 是 JS 未跑时的默认值（洞整体在画面外，照片完整），
-     99.4% 那点羽化是为了消掉硬边锯齿。 */
-  --bite-mask: radial-gradient(50% 50% at var(--bite-x, 150%) 50%, transparent 99.4%, #000 100%);
+  /* figure 的浏览器默认 margin 是 16px 40px，会把纸牌凭空削掉 80px 宽 */
+  margin: 0;
+  padding: 12px 12px 44px;
+  transform: rotate(-1.5deg);
+  mask-image: radial-gradient(var(--punch) var(--punch) at 16% 80%, transparent 99%, #000 100%);
 }
-/* 垫在照片底下的极淡圆盘：新月附近缺口会啃掉整张图，靠它让框子不落空。
-   --plate-o 由 client.ts 按亮度写入，亮度高于阈值就是 0，等于不存在 */
-.hero-plate {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: var(--plate);
-  opacity: var(--plate-o, 0);
-  transition: opacity 0.7s var(--ease);
-}
-.hero-img {
-  position: relative;
+.hero-paper img {
+  display: block;
   width: 100%;
-  height: 100%;
+  /* height:auto 不能省：<img> 上的 height 属性和 aspect-ratio 会打架，
+     两个维度都确定时 aspect-ratio 直接被忽略，图会按属性里的像素高铺开 */
+  height: auto;
+  aspect-ratio: 16 / 11;
   object-fit: cover;
-  /* 把照片压成蓝白双色调，和整套界面的钴蓝同源 */
-  filter: grayscale(1) contrast(1.3) brightness(1.3) sepia(1) hue-rotate(163deg) saturate(3.4);
-  animation: sink 30s ease-in-out infinite alternate;
-  mask-image: var(--bite-mask);
 }
-[data-theme='night'] .hero-img {
-  filter: grayscale(1) contrast(1.22) brightness(0.9) sepia(1) hue-rotate(163deg) saturate(3.8);
+.hero-paper figcaption {
+  /* 题注走右下，穿孔走左下：两者都在纸的下缘，挤在一起会互相啃 */
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  text-align: right;
+  font: italic 800 13px/1 var(--font-oblique);
+  letter-spacing: 0.12em;
 }
-@keyframes sink {
-  /* 用 object-position 挪取景窗，不要用 transform: scale ——
-     scale 是把已经裁好的栅格再放大，圆框图就是在这里糊掉的 */
-  from {
-    object-position: 50% 47%;
-  }
-  to {
-    object-position: 50% 53%;
-  }
+.hero-paper::after {
+  /* 撕纸旗标压在纸角，形状沿用 --flag 令牌 */
+  content: 'NOW';
+  position: absolute;
+  right: -6px;
+  top: 14px;
+  padding: 6px 14px 6px 10px;
+  clip-path: var(--flag);
+  font: 400 11px/1 var(--font-display);
+  letter-spacing: 0.24em;
 }
 .hero-stats {
   display: grid;
@@ -1639,27 +1635,24 @@ img {
   background: var(--red);
   box-shadow: none;
 }
-.hero-frame {
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  clip-path: none;
-  box-shadow: 16px 16px 0 var(--shadow-hard);
+.hero-paper {
+  background: var(--plate);
+  border: 1.5px solid var(--edge);
+  box-shadow: 14px 14px 0 var(--shadow-hard);
 }
-/* 黑边画在照片自己身上而不是框上：这样缺口（同一份 mask）会连着边一起啃掉，
-   被啃的那块边缘不会留下一道属于圆框的弧线 */
-.hero-img {
-  border: 3px solid var(--edge);
-  border-radius: 50%;
+.hero-paper img {
+  /* 把照片压成蓝白双色调，和整套界面的钴蓝同源 */
+  filter: grayscale(1) contrast(1.3) brightness(1.3) sepia(1) hue-rotate(163deg) saturate(3.4);
 }
-.hero-frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(0deg, rgba(18, 44, 104, 0.45) 0%, transparent 52%);
-  opacity: 0.3;
-  /* 这层蓝色调也一起被啃掉，否则缺口里会蒙一层 film，不像「少了一块」 */
-  mask-image: var(--bite-mask);
+[data-theme='night'] .hero-paper img {
+  filter: grayscale(1) contrast(1.22) brightness(0.9) sepia(1) hue-rotate(163deg) saturate(3.8);
+}
+.hero-paper figcaption {
+  color: var(--ink-2);
+}
+.hero-paper::after {
+  background: var(--flag-bg);
+  color: var(--flag-ink);
 }
 .hero-stats {
   background: var(--ink);

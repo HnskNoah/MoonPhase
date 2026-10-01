@@ -37,7 +37,7 @@ function moonPhase(date: Date = new Date()): MoonPhase {
   return { p, illum, name: phase.name, latin: phase.latin }
 }
 
-/** 品牌徽标、首页圆框、左侧月相轨共用同一个相位 */
+/** 品牌徽标与左侧月相轨共用同一个相位 */
 function paintMoon(): void {
   const m = moonPhase()
   const shift = m.p <= 0.5 ? m.p * 200 : (1 - m.p) * 200
@@ -49,14 +49,6 @@ function paintMoon(): void {
   // 徽标阴影圆按自身 SVG 的用户单位换算（viewBox 32，盘面 r=10.5）
   const bm = document.getElementById('bm-shadow') as SVGCircleElement | null
   if (bm) bm.style.transform = `translateX(${((dir * shift) / 100) * 21}px)`
-
-  // 圆框的缺口是照片上被啃掉的洞（.hero-frame 的 --bite-mask 在读这个变量），不是盖在上面的一片黑。
-  // 同时按亮度垫一层极淡的盘子：新月附近洞会啃掉整张图，亮度 ≥8% 时它是 0，等于不存在
-  const frame = document.querySelector<HTMLElement>('.hero-frame')
-  if (frame) {
-    frame.style.setProperty('--bite-x', `${50 + dir * shift}%`)
-    frame.style.setProperty('--plate-o', String(Math.max(0, (8 - m.illum) / 8) * 0.14))
-  }
 
   const nameEl = document.querySelector('.moon-name')
   if (nameEl) nameEl.textContent = `${m.name} · ${m.illum}%`
