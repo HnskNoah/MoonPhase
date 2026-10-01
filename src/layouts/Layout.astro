@@ -149,8 +149,11 @@ const discImg = await getImage({ src: abyss, width: 1000, format: 'webp' })
 
     <div class="moon-progress" aria-hidden="true">
       <span class="mp-label">MOON</span>
-      <span class="moon-disc">
-        <i class="moon-shadow"></i>
+      <!-- 外圈单独包一层：.moon-disc 要 overflow:hidden 裁月影，圈挂不到它自己身上 -->
+      <span class="moon-halo">
+        <span class="moon-disc">
+          <i class="moon-shadow"></i>
+        </span>
       </span>
       <span class="mp-track">
         <i class="mp-fill"></i>

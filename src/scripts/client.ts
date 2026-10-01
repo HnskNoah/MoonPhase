@@ -46,14 +46,16 @@ function paintMoon(): void {
   const rail = document.querySelector<SVGCircleElement>('.moon-shadow')
   if (rail) rail.style.transform = `translateX(${dir * shift}%)`
 
-  // 位移按各自 SVG 的用户单位换算（盘面直径）
-  for (const [id, d] of [
-    ['bm-shadow', 21],
-    ['hp-shadow', 32],
-    ['hp-rim', 31.4],
-  ] as const) {
-    const el = document.getElementById(id) as SVGCircleElement | null
-    if (el) el.style.transform = `translateX(${((dir * shift) / 100) * d}px)`
+  // 徽标阴影圆按自身 SVG 的用户单位换算（viewBox 32，盘面 r=10.5）
+  const bm = document.getElementById('bm-shadow') as SVGCircleElement | null
+  if (bm) bm.style.transform = `translateX(${((dir * shift) / 100) * 21}px)`
+
+  // 圆框的缺口是照片上被啃掉的洞（.hero-frame 的 --bite-mask 在读这个变量），不是盖在上面的一片黑。
+  // 同时按亮度垫一层极淡的盘子：新月附近洞会啃掉整张图，亮度 ≥8% 时它是 0，等于不存在
+  const frame = document.querySelector<HTMLElement>('.hero-frame')
+  if (frame) {
+    frame.style.setProperty('--bite-x', `${50 + dir * shift}%`)
+    frame.style.setProperty('--plate-o', String(Math.max(0, (8 - m.illum) / 8) * 0.14))
   }
 
   const nameEl = document.querySelector('.moon-name')

@@ -34,7 +34,7 @@ description: 谁在写、写什么、用什么写，以及你可以怎么联系�
 
 ## 联系
 
-- GitHub：[github.com/HnskNoah](https://github.com/HnskNoah)
-- 邮箱：`92558602+HnskNoah@users.noreply.github.com`
+- GitHub：[github.com/{{author}}](https://github.com/{{author}})
+- 邮箱：`92558602+{{author}}@users.noreply.github.com`
 
 代码与文字，都欢迎指出问题。

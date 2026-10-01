@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config'
 import sitemap from '@astrojs/sitemap'
 import { remarkHeadingIds } from './src/lib/headings'
+import { remarkPlaceholders } from './src/lib/placeholders'
+import { config } from './src/consts'
 
 /**
  * BASE_PATH 只取最后一段合法字符：
@@ -29,8 +31,21 @@ export default defineConfig({
     // 双主题：Astro 会同时输出 --shiki-light / --shiki-dark 两组色值，
     // 由 main.css 接管取值时机（跟我们的 NIGHT 开关，而不是系统的 prefers-color-scheme）
     shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' } },
-    // h2-h4 补 id，目录锚点才有地方跳
-    remarkPlugins: [remarkHeadingIds],
+    // h2-h4 补 id，目录锚点才有地方跳；{{...}} 从 consts 取值，改作者名只用改 consts
+    remarkPlugins: [
+      remarkHeadingIds,
+      [
+        remarkPlaceholders,
+        {
+          author: config.author,
+          title: config.title,
+          latinTitle: config.latinTitle,
+          subtitle: config.subtitle,
+          // 构建时年份；纯静态站没有运行时可以更新它，跨年要重新构建一次
+          year: String(new Date().getFullYear()),
+        },
+      ],
+    ],
     rehypePlugins: [],
   },
   vite: {

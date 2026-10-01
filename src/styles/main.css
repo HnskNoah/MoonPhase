@@ -27,7 +27,6 @@
   --accent-ink: #ffffff;
   --cyan: #35c6f5;
   --cobalt: #122c68;
-  --navy: #0b1c3d;
   --red: #e8402a;
   --red-text: #c22c16;
   /* 导航选中态的旗标：填充不透明，描边才干净 */
@@ -77,7 +76,6 @@
   --accent-ink: #04101d;
   --cyan: #35c6f5;
   --cobalt: #2a5cc0;
-  --navy: #071322;
   --red: #ff5f45;
   --red-text: #ff8070;
   --flag-bg: #16233a;
@@ -256,26 +254,6 @@ img {
 }
 .bm-shadow {
   fill: var(--eclipse);
-  transition: transform 0.7s var(--ease);
-}
-.hero-phase {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-/* 阴影圆单独相乘，界线的高光边才能正常显示（整层 multiply 会把白边吃掉） */
-.hp-shadow {
-  fill: var(--eclipse);
-  mix-blend-mode: multiply;
-  transition: transform 0.7s var(--ease);
-}
-.hp-rim {
-  fill: none;
-  stroke: var(--cyan);
-  stroke-width: 0.35;
-  opacity: 0.55;
   transition: transform 0.7s var(--ease);
 }
 
@@ -751,38 +729,50 @@ img {
   overflow: hidden;
   clip-path: var(--arch-clip);
   border-radius: var(--arch-radius);
-  border: 1px solid var(--line-2);
-  background: var(--panel-2);
+  /* 透明：月相缺口是照片上的洞，洞后面要直接是 .sea 那层背景，
+     这里铺一块板子就把「啃掉」又变回「盖住」了 */
+  background: transparent;
   aspect-ratio: 16 / 11;
   box-shadow: 0 30px 70px -30px #000;
+  /* 月相缺口：--bite-x 由 client.ts 按真实相位写入，缺口半径恒等于盘面半径。
+     方框里 50% 50% 就是半径等于半边宽的正圆；别写成 `circle 50%` ——
+     圆的百分比半径非法，整条声明会被丢掉、mask 静默变回 none。
+     150% 是 JS 未跑时的默认值（洞整体在画面外，照片完整），
+     99.4% 那点羽化是为了消掉硬边锯齿。 */
+  --bite-mask: radial-gradient(50% 50% at var(--bite-x, 150%) 50%, transparent 99.4%, #000 100%);
+}
+/* 垫在照片底下的极淡圆盘：新月附近缺口会啃掉整张图，靠它让框子不落空。
+   --plate-o 由 client.ts 按亮度写入，亮度高于阈值就是 0，等于不存在 */
+.hero-plate {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--plate);
+  opacity: var(--plate-o, 0);
+  transition: opacity 0.7s var(--ease);
 }
 .hero-img {
+  position: relative;
   width: 100%;
   height: 100%;
   object-fit: cover;
   /* 把照片压成 P3R 的蓝白双色调 */
   filter: grayscale(1) contrast(1.3) brightness(1.3) sepia(1) hue-rotate(163deg) saturate(3.4);
-  transform: scale(1.04);
   animation: sink 30s ease-in-out infinite alternate;
+  mask-image: var(--bite-mask);
 }
 [data-theme='night'] .hero-img {
   filter: grayscale(1) contrast(1.22) brightness(0.9) sepia(1) hue-rotate(163deg) saturate(3.8);
 }
 @keyframes sink {
+  /* 用 object-position 挪取景窗，不要用 transform: scale ——
+     scale 是把已经裁好的栅格再放大，圆框图就是在这里糊掉的 */
   from {
-    transform: scale(1.04) translateY(-1.2%);
+    object-position: 50% 47%;
   }
   to {
-    transform: scale(1.11) translateY(1.6%);
+    object-position: 50% 53%;
   }
-}
-.hero-frame-edge {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 .hero-stats {
   display: grid;
@@ -820,7 +810,10 @@ img {
 
 /* 潮汐分隔 */
 .tide {
-  height: 1px;
+  /* 盒子就是线本身：高光（12px 高）被 overflow 裁成一条，只在 2px 里透出中段，
+     和加粗前一样不会往上下晕开 */
+  --tide-line: 2px;
+  height: var(--tide-line);
   margin: 0 0 clamp(40px, 7vw, 76px);
   background: linear-gradient(90deg, transparent, var(--line-2) 20%, var(--accent) 50%, var(--line-2) 80%, transparent);
   position: relative;
@@ -828,10 +821,12 @@ img {
 }
 .tide span {
   position: absolute;
-  top: -3px;
+  /* 用 50% 减一半自身高度来对中，改 --tide-line 也不用回来挪这个数；
+     不能借 transform 对中，swim 动画占的就是 transform */
+  top: calc(50% - 6px);
   left: 0;
-  width: 120px;
-  height: 7px;
+  width: 160px;
+  height: 12px;
   background: radial-gradient(closest-side, var(--accent), transparent);
   animation: swim 9s linear infinite;
 }
@@ -1645,11 +1640,13 @@ img {
 .sea::after {
   content: '';
   position: absolute;
-  right: -10vw;
-  bottom: -12vh;
+  /* 尺寸与出血量沿用未用框架那一版（48vw / -18vw / -30vh）：
+     圆盘只占右下角，靠视口上沿不越过内容区 */
+  right: -18vw;
+  bottom: -30vh;
   top: auto;
-  width: 62vw;
-  height: 62vw;
+  width: 48vw;
+  height: 48vw;
   border-radius: 50%;
   /* 和首页大图用同一张素材、同一套双色调，两处才对得上；
      图片地址由 Layout 用 getImage() 注入到 --sea-disc-img */
@@ -1782,9 +1779,18 @@ img {
 .mp-track {
   color: var(--ink-3);
 }
+/* 与左上角徽标同一份配色与结构：白→钴蓝的竖向渐变（bm-sky）+ 一圈留了缝的 --edge 外环
+   （bm-ring 的 r=14.6 对盘面 r=10.5，间隙约是半径的 39%，这里 6px 就是按它缩放的） */
+.moon-halo {
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border: 1.5px solid var(--edge);
+  border-radius: 50%;
+}
 .moon-disc {
-  background: radial-gradient(circle at 34% 30%, #fff, var(--cyan) 45%, var(--cobalt) 100%);
-  box-shadow: 0 0 0 1.5px var(--ink);
+  background: linear-gradient(180deg, #fff, var(--cobalt));
+  box-shadow: none;
 }
 .mp-track {
   background: var(--line);
@@ -1827,10 +1833,15 @@ img {
 }
 .hero-frame {
   aspect-ratio: 1 / 1;
-  border: 3px solid var(--edge);
   border-radius: 50%;
   clip-path: none;
   box-shadow: 16px 16px 0 var(--shadow-hard);
+}
+/* 黑边画在照片自己身上而不是框上：这样缺口（同一份 mask）会连着边一起啃掉，
+   被啃的那块边缘不会留下一道属于圆框的弧线 */
+.hero-img {
+  border: 3px solid var(--edge);
+  border-radius: 50%;
 }
 .hero-frame::after {
   content: '';
@@ -1839,9 +1850,8 @@ img {
   pointer-events: none;
   background: linear-gradient(0deg, rgba(18, 44, 104, 0.45) 0%, transparent 52%);
   opacity: 0.3;
-}
-.hero-frame-edge {
-  display: none;
+  /* 这层蓝色调也一起被啃掉，否则缺口里会蒙一层 film，不像「少了一块」 */
+  mask-image: var(--bite-mask);
 }
 .hero-stats {
   background: var(--ink);
@@ -2349,6 +2359,11 @@ img {
   }
 }
 @media (max-width: 820px) {
+  /* 圆盘的纵向出血原本按 -30vh：手机屏幕太高，187px 的圆盘被整块顶出视口（实测露出 0%）。
+     窄屏改用与直径同源的 vw，右下角那块扇形就还在，比例也和桌面接近（露出约七成） */
+  .sea::after {
+    bottom: -14vw;
+  }
   .menu-btn {
     display: inline-block;
   }

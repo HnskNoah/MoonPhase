@@ -41,30 +41,18 @@ const tags = groups.slice(0, 6)
 
   <div class="hero-panel">
     <div class="hero-frame">
+      <!-- 新月附近缺口会啃掉整张图，这里垫一层极淡的盘子供框子不落空 -->
+      <span class="hero-plate" aria-hidden="true"></span>
       <Image
         class="hero-img"
         src={abyss}
         alt="深海与月光的抽象背景"
-        widths={[800, 1100, 1400]}
-        sizes="(max-width: 900px) 92vw, 520px"
+        widths={[800, 1100, 1400, 1792]}
+        sizes="(max-width: 900px) 161vw, 860px"
+        quality={90}
         loading="eager"
         decoding="async"
       />
-      <!-- 月相遮罩叠在照片上：multiply 混合，像明暗界线而不是一块黑 -->
-      <svg class="hero-phase" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-        <defs>
-          <clipPath id="hp-clip">
-            <circle cx="16" cy="16" r="16"></circle>
-          </clipPath>
-        </defs>
-        <g clip-path="url(#hp-clip)">
-          <circle class="hp-shadow" id="hp-shadow" cx="16" cy="16" r="16"></circle>
-        </g>
-        <g clip-path="url(#hp-clip)">
-          <circle class="hp-rim" id="hp-rim" cx="16" cy="16" r="15.7"></circle>
-        </g>
-      </svg>
-      <span class="hero-frame-edge" aria-hidden="true"></span>
     </div>
     <dl class="hero-stats">
       <div>
