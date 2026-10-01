@@ -3,7 +3,6 @@ import Layout from '../../layouts/Layout.astro'
 import PageHead from '../../components/PageHead.astro'
 import { loadPosts, groupByTag } from '../../lib/posts'
 import { u } from '../../lib/site'
-import { config } from '../../consts'
 
 const posts = await loadPosts()
 const groups = groupByTag(posts)

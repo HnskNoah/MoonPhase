@@ -1,3 +1,4 @@
+import type { Root } from 'mdast'
 import { slugify } from './text'
 
 /** 标题 id 的唯一算法：插件和页面都从这里取，保证 TOC 锚点一定对得上 */
@@ -5,28 +6,22 @@ export function headingId(text: string, n: number): string {
   return `s-${n}-${slugify(text).slice(0, 40)}`
 }
 
-interface MdText {
+/**
+ * 插件内部只看四件事：type / value / depth / children。
+ * 不直接依赖 mdast 的联合类型，是为了递归时不用逐层做窄化。
+ */
+interface MdLike {
   type: string
   value?: string
-  children?: MdNode[]
-}
-
-interface MdNode {
-  type: string
   depth?: number
-  children?: MdNode[]
-  data?: Record<string, unknown>
+  children?: MdLike[]
+  data?: { hProperties?: Record<string, unknown> } & Record<string, unknown>
 }
 
-/** 取标题纯文本（跳过代码/链接的嵌套结构） */
-export function mdText(node: MdNode | undefined): string {
-  if (!node) return ''
+/** 取标题纯文本（链接、加粗、行内代码都只挖里面的文字） */
+function mdText(node: MdLike): string {
   if (typeof node.value === 'string') return node.value
   return (node.children ?? []).map(mdText).join('')
-}
-
-export function isTocHeading(node: MdNode): boolean {
-  return node.type === 'heading' && (node.depth ?? 99) >= 2 && (node.depth ?? 99) <= 4
 }
 
 /**
@@ -34,17 +29,18 @@ export function isTocHeading(node: MdNode): boolean {
  * 计数器每次处理一棵新树时重置，插件实例是跨文档复用的。
  */
 export function remarkHeadingIds() {
-  return (tree: MdNode) => {
+  return (tree: Root) => {
     let n = 0
-    const walk = (node: MdNode) => {
-      if (isTocHeading(node)) {
+    const walk = (node: MdLike) => {
+      const depth = node.depth ?? 99
+      if (node.type === 'heading' && depth >= 2 && depth <= 4) {
         n += 1
         const id = headingId(mdText(node), n)
         node.data = { ...node.data, id, hProperties: { ...(node.data?.hProperties as object), id } }
       }
       for (const child of node.children ?? []) walk(child)
     }
-    walk(tree)
+    walk(tree as unknown as MdLike)
   }
 }
 

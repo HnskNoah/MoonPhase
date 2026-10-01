@@ -25,10 +25,10 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [sitemap()],
   markdown: {
-    // 代码块不做语法着色：配色由 main.css 统一控制，
-    // 夜间模式切换时代码块颜色能一起变（Shiki 双主题走的是 prefers-color-scheme，不跟我们的开关）
     syntaxHighlight: 'shiki',
-    shikiConfig: { defaultLang: 'text' },
+    // 双主题：Astro 会同时输出 --shiki-light / --shiki-dark 两组色值，
+    // 由 main.css 接管取值时机（跟我们的 NIGHT 开关，而不是系统的 prefers-color-scheme）
+    shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' } },
     // h2-h4 补 id，目录锚点才有地方跳
     remarkPlugins: [remarkHeadingIds],
     rehypePlugins: [],

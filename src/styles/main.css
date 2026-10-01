@@ -1203,19 +1203,6 @@ img {
   font-weight: 700;
   color: var(--ink-2);
 }
-.heading-anchor {
-  margin-left: 0.5em;
-  font-weight: 400;
-  color: var(--ink-3);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.prose h2:hover .heading-anchor,
-.prose h3:hover .heading-anchor,
-.prose h4:hover .heading-anchor {
-  opacity: 1;
-}
-
 .prose p {
   margin: 0 0 1.25em;
 }
@@ -2121,15 +2108,27 @@ img {
   color: var(--ink-link);
 }
 .prose pre {
-  background: var(--navy);
+  background: var(--plate);
   border: 1.5px solid var(--edge);
   border-radius: 0;
   clip-path: none;
   box-shadow: 7px 7px 0 var(--shadow-hover);
 }
 .prose pre code {
-  color: #d9f2ff;
+  color: var(--ink);
   background: none;
+}
+/* Shiki 双主题只把暗色挂在 --shiki-dark 上，浅色是直接写进 style 的 color，
+   内联样式压不过，所以接管切换时机时必须用 !important。
+   Astro 不会为 themes 生成任何切换规则（它默认那套走 prefers-color-scheme 的样式表在这里没输出），
+   暗色不接管就永远是浅色。 */
+[data-theme='night'] .prose pre,
+[data-theme='night'] .prose pre span {
+  color: var(--shiki-dark) !important;
+}
+[data-theme='night'] .prose pre {
+  background: var(--panel-2) !important;
+  border-color: var(--edge);
 }
 .prose th {
   background: var(--cobalt);

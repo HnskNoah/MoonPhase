@@ -60,13 +60,3 @@ export function groupByTag(posts: Post[]): TagGroup[] {
   }
   return [...map.values()].sort((a, b) => b.posts.length - a.posts.length || a.key.localeCompare(b.key))
 }
-
-export function groupByYear(posts: Post[]): { year: number; posts: Post[] }[] {
-  const map = new Map<number, Post[]>()
-  for (const p of posts) {
-    const y = p.date.getFullYear()
-    if (!map.has(y)) map.set(y, [])
-    map.get(y)!.push(p)
-  }
-  return [...map.entries()].sort((a, b) => b[0] - a[0]).map(([year, ps]) => ({ year, posts: ps }))
-}

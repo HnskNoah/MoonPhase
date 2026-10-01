@@ -16,12 +16,6 @@ export function isCjk(ch: string): boolean {
   return CJK_RANGES.some(([a, b]) => code >= a && code <= b)
 }
 
-export const escapeHtml = (s: string): string =>
-  String(s).replace(
-    /[&<>"']/g,
-    (c) => (({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }) as Record<string, string>)[c],
-  )
-
 /** 保留 \w、连字符与中日韩字符，其余压成 - */
 export function slugify(s: string): string {
   const out = Array.from(String(s).normalize('NFKD').toLowerCase())

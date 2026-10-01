@@ -7,6 +7,7 @@ Astro 5 + TypeScript 写的静态博客，视觉语言取自《女神异闻录3 
 ```bash
 npm install     # 装依赖
 npm run dev     # 本地开发 http://localhost:4321，带热更新
+npm run check   # 类型检查（.astro + .ts，CI 里在 build 之前跑）
 npm run build   # 生成 dist/
 npm run preview # 预览构建产物
 ```
@@ -114,6 +115,6 @@ BASE_PATH=/blog SITE_ORIGIN=https://<user>.github.io npm run build
 
 **月相侧栏看不见。** 窗口宽度小于 1320px 时隐藏，属于设计决定。
 
-**代码块没有语法高亮。** 故意的：`astro.config.ts` 里把 Shiki 的 `defaultLang` 设成 `text`。因为 Shiki 的双主题走 `prefers-color-scheme`，不跟我们的夜间开关；要高亮的话改成配 `themes: { light, dark }` 并接受系统偏好联动。
+**代码块颜色不跟着夜间模式变。** `astro.config.ts` 里配的是 `shikiConfig.themes: { light, dark }`，浅色值直接写进 `style="color:…"`，暗色值只挂在 `--shiki-dark` 上；Astro 附带的切换规则走 `prefers-color-scheme`，不认我们的开关，所以 `main.css` 里用 `[data-theme='night'] .prose pre span { color: var(--shiki-dark) !important }` 接管。换主题名只改 config 那两个字符串，别在 CSS 里写死色值。
 
 **字体没加载。** 标题用 Google Fonts 的 Archivo（含斜体）+ Noto Sans SC。访问不了会回落到系统中文字体，排版略偏但仍可用。彻底离线就把字体下载进 `src/assets/fonts/` 并改 `main.css` 顶部的 `--font-*`。

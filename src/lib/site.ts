@@ -12,11 +12,6 @@ export function u(path = '/'): string {
   return `${base}/${String(path).replace(/^\/+/, '')}`
 }
 
-/** 当前页到站点根的相对前缀 */
-export function rootPrefix(depth: number): string {
-  return '../'.repeat(depth)
-}
-
 /** 标签在 URL 里用的 key */
 export function tagKey(label: string): string {
   return config.tagKeys[label] || slugify(label) || encodeURIComponent(label)
