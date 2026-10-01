@@ -154,6 +154,6 @@ BASE_PATH=/MoonPhase SITE_ORIGIN=https://hnsknoah.github.io npm run build
 
 **代码块颜色不跟着夜间模式变。** `astro.config.ts` 配的是 `shikiConfig.themes: { light, dark }`，浅色值直接写进 `style="color:…"`，暗色值只挂在 `--shiki-dark` 上；Astro 在这种情况下不输出任何切换样式表，所以 `main.css` 里用 `[data-theme='night'] .prose pre span { color: var(--shiki-dark) !important }` 接管。换主题名只改 config 那两个字符串，别在 CSS 里写死色值。
 
-**换了 favicon 浏览器不更新。** `public/` 下的文件是原样拷贝、没有内容哈希，URL 一成不变，而 Chrome 的 favicon 缓存能撑好几天。所以 `Layout.astro` 在构建时读 `public/assets/favicon.svg` 算 sha256 前 8 位当查询参数（`favicon.svg?v=1da72b97`），图标一改 URL 就变，不用手动 bump 版本号。往 `public/` 里加别的图标类资源时同理。
+**换了 favicon 浏览器不更新。** `public/` 下的文件是原样拷贝、没有内容哈希，URL 一成不变，而 Chrome 的 favicon 缓存能撑好几天。所以 `Layout.astro` 在构建时读 `public/assets/favicon.svg` 算 sha256 前 8 位当查询参数（`favicon.svg?v=fdf10046`），图标一改 URL 就变，不用手动 bump 版本号。往 `public/` 里加别的图标类资源时同理。改这个 SVG 时注意：**XML 注释里不能出现连续两个连字符**（写 `--edge` 这种令牌名会让整份 SVG 解析失败，图标直接不显示，而构建不会报错）；改完可以把它丢进 `new DOMParser().parseFromString(s, 'image/svg+xml')` 验一下。
 
 **字体没加载。** 标题用 Google Fonts 的 Archivo（含斜体）+ Noto Sans SC，等宽是 JetBrains Mono。访问不了会回落到系统中文字体，排版略偏但仍可用。彻底离线就把字体下载进 `src/assets/fonts/` 并改 `main.css` 顶部的 `--font-*`。
