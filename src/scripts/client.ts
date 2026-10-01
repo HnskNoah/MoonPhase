@@ -3,45 +3,18 @@
    月相与阅读进度 / Dark Hour 时钟 / 目录高亮 / 移动菜单 / 夜间模式
    ========================================================================== */
 
-interface MoonPhase {
-  /** 0~1 相位 */
-  p: number
-  /** 亮度百分比 */
-  illum: number
-  name: string
-  latin: string
-}
-
-const SYNODIC = 29.530588853
-const NEW_MOON = Date.UTC(2000, 0, 6, 18, 14) // 一次已知新月
-const PHASES: { until: number; name: string; latin: string }[] = [
-  { until: 0.03, name: '新月', latin: 'NEW MOON' },
-  { until: 0.22, name: '娥眉月', latin: 'WAXING CRESCENT' },
-  { until: 0.28, name: '上弦月', latin: 'FIRST QUARTER' },
-  { until: 0.47, name: '盈凸月', latin: 'WAXING GIBBOUS' },
-  { until: 0.53, name: '满月', latin: 'FULL MOON' },
-  { until: 0.72, name: '亏凸月', latin: 'WANING GIBBOUS' },
-  { until: 0.78, name: '下弦月', latin: 'LAST QUARTER' },
-  { until: 0.97, name: '残月', latin: 'WANING CRESCENT' },
-]
+import { litPathD, moonPhase } from '../lib/moon'
 
 const root = document.documentElement
 const body = document.body
 
-function moonPhase(date: Date = new Date()): MoonPhase {
-  const days = (date.getTime() - NEW_MOON) / 86400000
-  let p = (days % SYNODIC) / SYNODIC
-  if (p < 0) p += 1
-  const illum = Math.round(((1 - Math.cos(2 * Math.PI * p)) / 2) * 100)
-  const phase = PHASES.find((x) => p < x.until) ?? PHASES[0]
-  return { p, illum, name: phase.name, latin: phase.latin }
-}
-
-/** 品牌徽标与左侧月相轨共用同一个相位 */
+/** 品牌徽标、左侧月相轨、首页月亮共用同一个相位 */
 function paintMoon(): void {
   const m = moonPhase()
   const shift = m.p <= 0.5 ? m.p * 200 : (1 - m.p) * 200
-  const dir = m.p < 0.5 ? 1 : -1
+  // 影圆往哪边走：盈月（p<0.5）往左推 → 亮面露在右边，和下弦镜像。
+  // 北半球口径，和 favicon 那个固定缺口（亮右）一致
+  const dir = m.p < 0.5 ? -1 : 1
 
   const rail = document.querySelector<SVGCircleElement>('.moon-shadow')
   if (rail) rail.style.transform = `translateX(${dir * shift}%)`
@@ -49,6 +22,17 @@ function paintMoon(): void {
   // 徽标阴影圆按自身 SVG 的用户单位换算（viewBox 32，盘面 r=10.5）
   const bm = document.getElementById('bm-shadow') as SVGCircleElement | null
   if (bm) bm.style.transform = `translateX(${((dir * shift) / 100) * 21}px)`
+
+  // 首页月亮：亮面是「外沿半圆 + 半条椭圆终止线」，暗面交给地照光那一层
+  const lit = document.getElementById('hm-litpath')
+  if (lit) lit.setAttribute('d', litPathD(m.p))
+  for (const id of ['hm-age-dark', 'hm-age-lit']) {
+    const el = document.getElementById(id)
+    if (el) el.textContent = String(m.age)
+  }
+
+  // 背景那轮圆盘按今晚亮度呼吸（覆盖 Layout 写在 <html> 上的构建期值）
+  root.style.setProperty('--moon-lit', m.lit.toFixed(3))
 
   const nameEl = document.querySelector('.moon-name')
   if (nameEl) nameEl.textContent = `${m.name} · ${m.illum}%`

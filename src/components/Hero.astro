@@ -1,7 +1,8 @@
 ---
-import { Image } from 'astro:assets'
-import abyss from '../assets/abyss.jpg'
+import { getImage } from 'astro:assets'
+import moon from '../assets/moon.jpg'
 import type { Post, TagGroup } from '../lib/posts'
+import { litPathD, moonPhase } from '../lib/moon'
 import { config } from '../consts'
 import { u } from '../lib/site'
 
@@ -13,6 +14,13 @@ interface Props {
 const { posts, groups } = Astro.props
 const latest = posts[0]
 const tags = groups.slice(0, 6)
+
+/* 构建时先按当天预画一帧，脚本加载后再按访问日期重画 —— 别让月亮先空着 */
+const m = moonPhase()
+const litD = litPathD(m.p)
+/* 亮面和暗面是同一张月面照片，同一个 URL：浏览器只解一次码、不多一个请求。
+   直径最大 440px，2 倍图取 960 足够 */
+const disc = await getImage({ src: moon, width: 960, format: 'webp' })
 ---
 
 <section class="hero">
@@ -40,18 +48,34 @@ const tags = groups.slice(0, 6)
   </div>
 
   <div class="hero-panel">
-    <figure class="hero-paper">
-      <Image
-        src={abyss}
-        alt="深海与月光的抽象背景"
-        widths={[800, 1100, 1400]}
-        sizes="(max-width: 900px) 92vw, 500px"
-        quality={90}
-        loading="eager"
-        decoding="async"
-      />
-      <figcaption>NO.{String(posts.length).padStart(3, '0')} · {latest.latin || 'RECORD'}</figcaption>
-    </figure>
+    <div class="moon-stage">
+      <svg class="hero-moon" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <clipPath id="hm-disc">
+            <circle cx="50" cy="50" r="50" />
+          </clipPath>
+          <clipPath id="hm-lit">
+            <path id="hm-litpath" d={litD} />
+          </clipPath>
+        </defs>
+        <g clip-path="url(#hm-disc)">
+          <!-- 暗面 = 地照光：整盘先铺一遍同一张月面并压到很暗，被地球反照照亮的那半边 -->
+          <image class="hm-earthshine" href={disc.src} x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice" />
+          <g class="hm-on-dark">
+            <text class="hm-age" x="50" y="50" id="hm-age-dark">{m.age}</text>
+            <text class="hm-cap" x="50" y="70">月龄</text>
+          </g>
+          <!-- 亮面盖在暗面上，交界就是今晚那条椭圆终止线 -->
+          <g clip-path="url(#hm-lit)">
+            <image class="hm-litface" href={disc.src} x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice" />
+            <g class="hm-on-lit">
+              <text class="hm-age" x="50" y="50" id="hm-age-lit">{m.age}</text>
+              <text class="hm-cap" x="50" y="70">月龄</text>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
     <dl class="hero-stats">
       <div>
         <dt>PHASE</dt>

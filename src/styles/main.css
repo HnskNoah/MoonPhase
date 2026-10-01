@@ -635,52 +635,34 @@ img {
 
 .hero-panel {
   position: relative;
-  /* 容器要开在父级：cqi 在声明 container-type 的那个元素自己身上取不到容器尺寸
-     （规范为避免循环会退回视口单位），写在 .hero-paper 里就等于 vw 而不是纸宽 */
-  container-type: inline-size;
 }
-/* 首页右栏是一张微微旋转的纸牌：照片按原生 16:11 印在上面，
-   月相是纸上的一处穿孔（透出背后的海面），不是盖在图上的效果 */
-.hero-paper {
-  /* 穿孔半径按纸自身的宽度算（cqi = 容器 .hero-panel 内联方向的 1%，纸牌铺满它）：
-     固定 px 在窄屏会压到右下题注、在宽屏比例失衡；而百分比半径在非正方形的纸上会变成椭圆。
-     两个半径同取 cqi 才是正圆，且恒占纸宽 24% */
-  --punch: 12cqi;
+/* 首页右栏就是一颗月亮，不再垫纸：直径跟着右栏走、封顶 440px。
+   亮面是「外沿半圆 + 半条椭圆终止线」裁出来的，暗面交给地照光那一层 */
+.moon-stage {
   position: relative;
-  /* figure 的浏览器默认 margin 是 16px 40px，会把纸牌凭空削掉 80px 宽 */
-  margin: 0;
-  padding: 12px 12px 44px;
-  transform: rotate(-1.5deg);
-  mask-image: radial-gradient(var(--punch) var(--punch) at 16% 80%, transparent 99%, #000 100%);
+  width: min(100%, 440px);
+  /* 正方形由 aspect-ratio 保证：SVG 的 viewBox 是 100x100，盒子一变形月亮就成椭圆 */
+  aspect-ratio: 1;
+  margin: 0 auto;
 }
-.hero-paper img {
-  display: block;
+.hero-moon {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  /* height:auto 不能省：<img> 上的 height 属性和 aspect-ratio 会打架，
-     两个维度都确定时 aspect-ratio 直接被忽略，图会按属性里的像素高铺开 */
-  height: auto;
-  aspect-ratio: 16 / 11;
-  object-fit: cover;
+  height: 100%;
+  display: block;
 }
-.hero-paper figcaption {
-  /* 题注走右下，穿孔走左下：两者都在纸的下缘，挤在一起会互相啃 */
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  text-align: right;
-  font: italic 800 13px/1 var(--font-oblique);
-  letter-spacing: 0.12em;
+/* 字号写在 viewBox 用户单位里（100 = 直径），所以 30 就是直径的 30%，缩放时跟着长 */
+.hm-age {
+  font: italic 900 30px/1 var(--font-oblique);
+  text-anchor: middle;
+  dominant-baseline: central;
+  letter-spacing: -0.02em;
 }
-.hero-paper::after {
-  /* 撕纸旗标压在纸角，形状沿用 --flag 令牌 */
-  content: 'NOW';
-  position: absolute;
-  right: -6px;
-  top: 14px;
-  padding: 6px 14px 6px 10px;
-  clip-path: var(--flag);
-  font: 400 11px/1 var(--font-display);
-  letter-spacing: 0.24em;
+.hm-cap {
+  font: 400 6.5px/1 var(--font-display);
+  letter-spacing: 0.3em;
+  text-anchor: middle;
 }
 .hero-stats {
   display: grid;
@@ -1457,7 +1439,10 @@ img {
   background:
     radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.22), transparent 48%),
     var(--sea-disc-img) 50% 45% / cover no-repeat;
-  filter: grayscale(1) contrast(1.28) brightness(1.18) sepia(1) hue-rotate(163deg) saturate(3.3);
+  /* 跟着今晚的月相呼吸：满月时就是原来的定值 1.18，越缺越暗，摆幅 ±13%。
+     --moon-lit 是 0~1 的亮度，构建期写在 <html> 上、脚本加载后覆盖 */
+  filter: grayscale(1) contrast(1.28) brightness(calc(1.18 * (0.87 + 0.26 * var(--moon-lit, 1)) / 1.13))
+    sepia(1) hue-rotate(163deg) saturate(3.3);
   box-shadow: 0 40px 120px -40px rgba(11, 28, 61, 0.55);
 }
 .sea-rays {
@@ -1635,24 +1620,21 @@ img {
   background: var(--red);
   box-shadow: none;
 }
-.hero-paper {
-  background: var(--plate);
-  border: 1.5px solid var(--edge);
-  box-shadow: 14px 14px 0 var(--shadow-hard);
+/* 暗面 = 地照光：整盘先铺一遍同一张月面再压暗。白天它是浅页面上的一块暗盘；
+   夜里页面背景本身接近黑（--bg-0 L≈12），所以提一点亮度让它比背景亮 —— 两个主题都成立。
+   两张 image 是同一个 URL，浏览器只解一次码 */
+.hm-earthshine {
+  filter: brightness(0.1) saturate(0.45) contrast(1.05);
 }
-.hero-paper img {
-  /* 把照片压成蓝白双色调，和整套界面的钴蓝同源 */
-  filter: grayscale(1) contrast(1.3) brightness(1.3) sepia(1) hue-rotate(163deg) saturate(3.4);
+[data-theme='night'] .hm-earthshine {
+  filter: brightness(0.16) saturate(0.45) contrast(1.05);
 }
-[data-theme='night'] .hero-paper img {
-  filter: grayscale(1) contrast(1.22) brightness(0.9) sepia(1) hue-rotate(163deg) saturate(3.8);
+/* 月龄数字两份，各被自己的区域裁着：暗面上用亮墨，月面上用深墨（月面是浅灰，任何主题都压得住） */
+.hm-on-dark {
+  fill: #cfe9ff;
 }
-.hero-paper figcaption {
-  color: var(--ink-2);
-}
-.hero-paper::after {
-  background: var(--flag-bg);
-  color: var(--flag-ink);
+.hm-on-lit {
+  fill: #16202c;
 }
 .hero-stats {
   background: var(--ink);
@@ -2103,7 +2085,8 @@ img {
 }
 /* 夜里的背景圆盘压暗，别和正文抢注意力 */
 [data-theme='night'] .sea::after {
-  filter: grayscale(1) contrast(1.18) brightness(0.46) sepia(1) hue-rotate(163deg) saturate(2.8);
+  filter: grayscale(1) contrast(1.18) brightness(calc(0.46 * (0.4 + 0.12 * var(--moon-lit, 1)) / 0.52))
+    sepia(1) hue-rotate(163deg) saturate(2.8);
 }
 [data-theme='night'] .nav-item:hover::before {
   background: rgba(53, 198, 245, 0.14);

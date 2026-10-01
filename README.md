@@ -34,13 +34,15 @@ src/lib/                    构建期的纯函数，全部不碰 DOM
   paginate.ts               通用分页（归档与标签页共用）
   headings.ts               标题 id 的唯一算法 + 补 id 的 remark 插件 + 目录生成
   placeholders.ts           {{author}} 这类占位符的 remark 插件
+  moon.ts                   月相计算：相位 / 亮度 / 月龄 / 亮面轮廓路径（构建期预画与浏览器共用一份）
 
 src/layouts/Layout.astro    全站外壳：head、顶栏、月相轨、页脚、绘制前落主题的内联脚本
 src/components/             Hero / Feature / PostList / PostCard / PageHead / ArchiveBody / Pager / SectionHead
 src/pages/                  路由，见下表
 src/scripts/client.ts       浏览器侧：月相 / 阅读进度 / Dark Hour 时钟 / 夜间开关 / 目录高亮 / 移动菜单
 src/styles/main.css         前段骨架（尺寸布局动效）+ 后段皮肤（颜色描边阴影切角），同一属性不重复
-src/assets/abyss.jpg        首页纸牌上的照片与背景圆盘共用同一张原图，交给 astro:assets 出多档 WebP
+src/assets/abyss.jpg        背景那层大圆盘的原图（首页右栏已经不用它），交给 astro:assets 出 WebP
+src/assets/moon.jpg         首页月亮的盘面照片，NASA Goddard 拍的满月，公有领域、无需署名；已从 2400² 裁成 1200² 正方形、盘面内切
 public/                     原样拷贝：assets/favicon.svg、.nojekyll
 .github/workflows/deploy.yml  npm ci → astro check → build → 把 dist/ 作为 Pages 产物
 ```
@@ -124,19 +126,19 @@ BASE_PATH=/MoonPhase SITE_ORIGIN=https://hnsknoah.github.io npm run build
 | `--eclipse`                        | 月食缺口的暗色   | `#0b1c33`                | `#04070a`                   |
 | `--ink-link` / `--red-text`        | 纸面上的强调文字 | `#122c68` / `#c22c16`    | `#7cc0ff` / `#ff8070`       |
 
-形状令牌（`--flag`、`--flag-inner`、`--chip-clip`、`--chip-radius`、首页纸牌的 `--punch`）也在 `:root` 或组件规则里，改轮廓只动那里。
+形状令牌（`--flag`、`--flag-inner`、`--chip-clip`、`--chip-radius`）也在 `:root` 或组件规则里，改轮廓只动那里。
 
 主题选择在 localStorage（键 `p3-night`），首次访问跟随系统 `prefers-color-scheme`；`<head>` 里有一段内联脚本在绘制前落 `data-theme`，避免闪白。
 
 ## 已实现的东西
 
-- 首页（Hero：左侧文字 + 右侧一张微微旋转的纸牌照片 + 三条读数，下面接重点记录、最近五条、引言块）
+- 首页（Hero：左侧文字 + 右侧一颗按真实相位画的月亮 + 三条读数，下面接重点记录、最近五条、引言块）
 - 文章页：目录侧栏、滚动高亮、上一篇/下一篇、阅读时长、标题锚点
 - 归档页按年分组并分页（每页 30），标签墙与标签页同样分页（每页 20）
 - 关于页、404 页
 - RSS (`/rss.xml`)、`sitemap-index.xml`、robots
-- 图片管线：首页纸牌的照片按原生 16:11 由 `astro:assets` 出 3 档 WebP（`quality={90}`，93KB 原图 → 22/36/52KB）并写进 `srcset`；背景那层大圆盘单独取 1000w
-- 左侧月相轨与左上角徽标共用同一个相位计算（`client.ts` 的 `paintMoon()`）：两处都是填 `--eclipse` 暗色的缺口，不是镂空
+- 图片管线：月亮盘面 1200² 原图由 `astro:assets` 出 960w WebP（239KB → 95KB），亮面与暗面共用同一个 URL，浏览器只解一次码；背景那层大圆盘单独取 1000w
+- 三处月相同用一个相位计算（`src/lib/moon.ts`，`client.ts` 的 `paintMoon()` 调用）：左上角徽标与左侧月相轨是填 `--eclipse` 暗色的两圆近似，首页月亮是真实盘面 + 椭圆终止线 + 地照光暗面。前两处形状一致，第三处面积严格等于亮度
 - 顶栏 Dark Hour 时钟，走到 0:00 会高亮提示
 - 整张卡片可点击（标题链接铺满卡片，标签与 READ 仍可单独点）
 - 页面跳转不做自定义转场：走浏览器原生导航，少一层跨浏览器不一致
@@ -150,14 +152,16 @@ BASE_PATH=/MoonPhase SITE_ORIGIN=https://hnsknoah.github.io npm run build
 
 **月相侧栏看不见。** 窗口宽度小于 1320px 时隐藏，属于设计决定。
 
-**首页右栏（纸牌）改起来注意四件事。**
+**首页右栏（月亮）改起来注意八件事。**
 
-- 照片按**原生 16:11** 印，不要为了形状去裁它。之前它是 1:1 圆框，`object-fit: cover` 只能取原图 1792×1024 中间那条 1024px 高的横条，2× 屏上框一超过约 512 CSS px 就必糊，多加 `srcset` 档位救不回来 —— 现在的糊法源头已经拿掉。
-- 浮游动效**不要改回 `transform: scale`**：那是把裁好的栅格再放大，之前 1.04→1.11 的范围等于凭空损失 11% 分辨率。
-- `<img>` 上的 `height` 属性和 CSS `aspect-ratio` 会打架：两个维度都确定时 `aspect-ratio` 被直接忽略，图会按属性里的像素高铺开。`.hero-paper img` 里那句 `height: auto` 不能省。
-- `<figure>` 有浏览器默认 `margin: 16px 40px`，不归零会凭空削掉 80px 宽。
-
-穿孔（`--punch: 12cqi`）用的是容器查询单位而不是百分比：纸不是正方形，百分比半径会变成椭圆；固定 px 又会在窄屏压到右下题注、在宽屏比例失衡。**容器 `container-type: inline-size` 必须开在父级 `.hero-panel` 上**——开在 `.hero-paper` 自己身上的话，`cqi` 在同一元素里取不到容器尺寸（规范为避免循环会退回视口单位），实测会等于 12% 视口宽，桌面下洞能占到纸宽 63%。开在父级后两个半径同取 cqi 既是正圆又恒占纸宽 24%（320~1440 逐档量过：23~24%，左缘留 12~35px、下缘留 14~27px、不碰题注）。
+- 亮面是**外沿半圆 + 半条椭圆终止线**（`litPathD()`，`src/lib/moon.ts`），`rx = 50·cos(2πp)`。这样亮区面积严格等于真实亮度；旧的「两圆相切」是近似，上弦时开口面积 61% 而真实亮面是 50%。上下弦不用特判：SVG 规范里零半径的弧直接当直线画，那条界自己就变直了。
+- 亮度 <2% 时 `litPathD()` 返回**空字符串**，整轮交给暗面。别去掉这个阈值：新月附近亮面会缩成贴着圆边一条缝，偏移 2 个用户单位在 440px 盘上就是 2.3px 的亮线，看着像接缝错位而不像残月。
+- **暗面不能是透明的**。以前那是「纸被啃穿、透出页面背景」，现在月亮是个独立物体，暗面透明等于连轮廓一起啃掉、新月整轮消失。所以暗面走地照光：同一张月面压暗再铺亮面。两个主题的系数不能合并 —— 白天页面 L=241，暗面 L≈14 是一块暗盘；夜里页面 L=12，暗面必须**比背景亮**（L≈23）才看得见，所以夜里是 `brightness(0.16)` 不是 0.1。
+- 朝向：盈月亮面在右、亏月在左（北半球口径）。`client.ts` 里只有一个 `dir`，翻它徽标和月相轨一起跟着翻；favicon 的静态缺口本来就是亮右。
+- 月龄数字**画两份**，各被自己的区域裁着：暗面上亮墨、月面上深墨。改成一份加描边不会跟着明暗界线走。字号写在 viewBox 的用户单位里（`30` = 直径的 30%），盘子缩放它跟着长。
+- `.moon-stage` 的 `aspect-ratio: 1` 不能省：viewBox 是 100×100，盒子一变形月亮就成椭圆。也别给浮游动效加 `transform: scale` —— 那是把裁好的栅格再放大。
+- 构建期 `Hero.astro` 会按**构建当天**预画一帧亮面和月龄，脚本加载后再按访问日期重画，所以月亮不会在 JS 跑起来之前空着。相位公式只允许 `src/lib/moon.ts` 一份，构建期和浏览器共用。
+- 素材：`src/assets/moon.jpg` 是 NASA Goddard 拍的满月，公有领域、无需署名。已从 2400² 按量出来的圆心跳到正方形外接框（往里收 2px，免得把黑边带进圆内）缩到 1200²。换图的话重新量一次盘面，别目测裁。
 
 **代码块颜色不跟着夜间模式变。** `astro.config.ts` 配的是 `shikiConfig.themes: { light, dark }`，浅色值直接写进 `style="color:…"`，暗色值只挂在 `--shiki-dark` 上；Astro 在这种情况下不输出任何切换样式表，所以 `main.css` 里用 `[data-theme='night'] .prose pre span { color: var(--shiki-dark) !important }` 接管。换主题名只改 config 那两个字符串，别在 CSS 里写死色值。
 

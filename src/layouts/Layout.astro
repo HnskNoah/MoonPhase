@@ -6,6 +6,7 @@ import '../styles/main.css'
 import { getImage } from 'astro:assets'
 import abyss from '../assets/abyss.jpg'
 import { config } from '../consts'
+import { moonPhase } from '../lib/moon'
 import { u, fmtDateLatin } from '../lib/site'
 
 /**
@@ -49,10 +50,16 @@ const navItems = config.nav.map((item) => ({ ...item, href: u(item.href), on: is
  * 那张图被 astro:assets 接管后 Vite 只输出优化过的 webp，CSS 里的原图路径会 404。
  */
 const discImg = await getImage({ src: abyss, width: 1000, format: 'webp' })
+
+/**
+ * 背景圆盘跟着月相呼吸的插值系数。写在 <html> 上，脚本加载后 client.ts 覆盖同一个属性
+ * （同一个元素、后写生效）；不开 JS 就停在构建当天那晚的样子。
+ */
+const moonLit = moonPhase().lit.toFixed(3)
 ---
 
 <!doctype html>
-<html lang={config.locale}>
+<html lang={config.locale} style={`--moon-lit: ${moonLit}`}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
