@@ -1,22 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="月相">
-  <!-- 与顶栏徽标同一份几何：外环 r=14.6 + 盘面 r=10.5 + 白→钴蓝竖向渐变。
-       没有底板：标签页有明有暗，铺一块死色总有一侧难看。
-       缺口用 mask 真空心掉（和首页圆框一样是「被啃掉」），不是拿底色画上去——
-       底色画出来的缺口在透明底上会变成一块不透明的斑。
-       环取深色（对应样式里的 edge 令牌）：亮标签页上靠它撑出轮廓，暗标签页上白盘面本身就够亮。
-       缺口位置固定，不跟真实月相走：图标天天变反而认不出来。 -->
+  <!-- 顶栏徽标 / 月相轨的静态版：外环 r=14.6（edge 色，完整一圈不被咬）+ 盘面 r=10.5
+       （白→钴蓝竖向渐变）+ 一个被 clipPath 关在盘面里的暗色缺口（eclipse 色）。
+       这里不镂空：镂空是首页圆框的做法，徽标和轨都是填暗色。
+       背景透明，不铺底板：标签页有明有暗，铺一块死色总有一侧难看。
+       缺口位置固定，不跟真实月相走（徽标那个由 JS 推，图标天天变反而认不出来）。 -->
   <defs>
+    <clipPath id="c"><circle cx="16" cy="16" r="10.5"/></clipPath>
     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
       <stop offset="1" stop-color="#122c68"/>
     </linearGradient>
-    <mask id="bite" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32">
-      <rect width="32" height="32" fill="#fff"/>
-      <circle cx="2.5" cy="16" r="10.5" fill="#000"/>
-    </mask>
   </defs>
-  <g mask="url(#bite)">
-    <circle cx="16" cy="16" r="14.6" fill="none" stroke="#0a121c" stroke-width="1.5"/>
-    <circle cx="16" cy="16" r="10.5" fill="url(#g)"/>
-  </g>
+  <circle cx="16" cy="16" r="14.6" fill="none" stroke="#0a121c" stroke-width="1.5"/>
+  <circle cx="16" cy="16" r="10.5" fill="url(#g)"/>
+  <g clip-path="url(#c)"><circle cx="2.5" cy="16" r="10.5" fill="#0b1c3d"/></g>
 </svg>
