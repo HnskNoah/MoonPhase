@@ -16,23 +16,58 @@ npm run preview # 预览构建产物
 
 `astro build` 自己不做 typecheck，所以改动落地前跑 `npm run check`。
 
-## 目录
+## 项目结构
+
+四层，依赖方向只往下：`pages → layouts/components → lib → content/consts`，浏览器侧的 `scripts/client.ts` 只认 DOM 和 CSS 变量，不参与构建期。
 
 ```text
-src/content/posts/*.md   文章（frontmatter + Markdown）
-src/content/pages/*.md   独立页面（关于等）
-src/content.config.ts    内容集合与 zod 校验（字段写错会构建失败，不会静默兜底）
-src/consts.ts            站点信息、导航、标签映射、分页大小、RSS 条数
-src/lib/                 日期 / slug / 罗马数字 / 阅读时长 / 摘录 / 分页 / 标题锚点 / 占位符替换
-src/layouts/Layout.astro 全站外壳（head、顶栏、月相轨、页脚）
-src/components/          Hero / PostCard / PageHead / ArchiveBody / Pager 等
-src/pages/               路由：首页、文章、归档（分页）、标签（分页）、关于、404、rss、robots
-src/styles/main.css      全部样式与主题令牌
-src/scripts/client.ts    月相 / 阅读进度 / 时钟 / 夜间模式 / 目录高亮 / 移动菜单
-src/assets/              需要进图片管线的素材（头图）
-public/                  原样拷贝的资源（favicon、.nojekyll）
-astro.config.ts          site / base / 集成 / markdown 插件
+astro.config.ts             site / base / 集成 / markdown 插件（两个 remark 插件都挂在这）
+src/consts.ts               站点信息、导航、标签映射、分页大小、RSS 条数 —— 纯数据，不含 import.meta.env
+src/content.config.ts       两个内容集合 + zod 校验（字段写错构建就失败，不静默兜底）
+src/content/posts/*.md      文章
+src/content/pages/*.md      独立页面（按 slug 出到站点根，目前只有关于页）
+
+src/lib/                    构建期的纯函数，全部不碰 DOM
+  text.ts                   日期 / slug / 罗马数字 / 阅读时长 / 是否中日韩字符 / 摘录
+  site.ts                   base 与前缀 u()、标签 key；末尾 re-export text.ts
+  posts.ts                  读集合、置顶+日期排序、标签分组、阅读时长、摘要
+  paginate.ts               通用分页（归档与标签页共用）
+  headings.ts               标题 id 的唯一算法 + 补 id 的 remark 插件 + 目录生成
+  placeholders.ts           {{author}} 这类占位符的 remark 插件
+
+src/layouts/Layout.astro    全站外壳：head、顶栏、月相轨、页脚、绘制前落主题的内联脚本
+src/components/             Hero / Feature / PostList / PostCard / PageHead / ArchiveBody / Pager / SectionHead
+src/pages/                  路由，见下表
+src/scripts/client.ts       浏览器侧：月相 / 阅读进度 / Dark Hour 时钟 / 夜间开关 / 目录高亮 / 移动菜单
+src/styles/main.css         前段骨架（尺寸布局动效）+ 后段皮肤（颜色描边阴影切角），同一属性不重复
+src/assets/abyss.jpg        首页圆框与背景圆盘共用的原图，交给 astro:assets 出多档 WebP
+public/                     原样拷贝：assets/favicon.svg、.nojekyll
+.github/workflows/deploy.yml  npm ci → astro check → build → 把 dist/ 作为 Pages 产物
 ```
+
+### 路由
+
+| 文件                                   | URL                | 说明                                      |
+| -------------------------------------- | ------------------ | ----------------------------------------- |
+| `src/pages/index.astro`                | `/`                | 首页：Hero + 重点记录 + 最近五条 + 引言块 |
+| `src/pages/posts/[...slug].astro`      | `/posts/<slug>/`   | 文章页：目录、滚动高亮、上一篇/下一篇     |
+| `src/pages/archive/index.astro`        | `/archive/`        | 归档第 1 页                               |
+| `src/pages/archive/[...page].astro`    | `/archive/<n>/`    | 归档第 2 页起                             |
+| `src/pages/tags/index.astro`           | `/tags/`           | 标签墙                                    |
+| `src/pages/tags/[tag]/index.astro`     | `/tags/<key>/`     | 标签页第 1 页                             |
+| `src/pages/tags/[tag]/[...page].astro` | `/tags/<key>/<n>/` | 标签页第 2 页起                           |
+| `src/pages/[...slug].astro`            | `/<slug>/`         | 内容页面（关于页走这里）                  |
+| `src/pages/404.astro`                  | `404.html`         | GitHub Pages 的自定义 404                 |
+| `src/pages/rss.xml.ts`                 | `/rss.xml`         | RSS                                       |
+| `src/pages/robots.txt.ts`              | `/robots.txt`      | 指向带 base 前缀的 sitemap                |
+
+`trailingSlash: 'always'`，所以站内链接一律带尾斜杠；`<key>` 是中文标签在 `consts.ts` 的 `tagKeys` 里映射出的 ASCII（技术→tech、设计→design…），映射缺失时回落到 slugify。
+
+### 依赖
+
+只有 `astro` + `@astrojs/rss` + `@astrojs/sitemap` 三个运行时依赖，dev 侧加 `@astrojs/check`、`typescript`、`@types/mdast`、`prettier`(+astro 插件)。没有 UI 框架、没有客户端状态库、没有 CSS 框架。
+
+当前 6 篇示例文章构建出 17 个 HTML（数据量小时分页路由不产出第 2 页）。
 
 ## 加一篇文章
 
@@ -75,6 +110,8 @@ BASE_PATH=/MoonPhase SITE_ORIGIN=https://hnsknoah.github.io npm run build
 
 ## 配色：一套语言 + 夜间模式
 
+`main.css` 分两段：前面是**骨架**（尺寸、布局、动效），后面 `皮肤 · 纸面与硬阴影` 一段只改颜色、描边、阴影、切角。同一个选择器允许在两处各写一半，但**同一个属性不允许写两遍**——历史上这里叠了三套主题并存时的重复定义，已经按「只删永远输掉的那份声明」的方式折掉了（172 条声明、15 条空规则）。改样式前先想清楚属于哪一层：调大小去骨架，调颜色去皮肤。
+
 夜间模式只翻令牌，不重写组件，所以新加样式时**不要写死颜色**：
 
 | 令牌                               | 含义             | 浅色                     | 夜间                        |
@@ -116,5 +153,7 @@ BASE_PATH=/MoonPhase SITE_ORIGIN=https://hnsknoah.github.io npm run build
 **圆框图糊。** 两条来路，别再踩回去：一是动效，`@keyframes sink` 用 `object-position` 挪取景窗，**不要改回 `transform: scale`**——那是把裁好的栅格再放大 4~11%。二是取景比例，圆框是 1:1 而原图 1792×1024，`object-fit: cover` 永远只看得见中间那条 1024px 高的横条，所以 2× 屏上框一旦超过约 512 CSS px 就会开始糊，多加 `srcset` 档位救不了，只能换更高或接近正方形的原图、或者压小框。`sizes` 也因此按「框宽 ×1.75」写（`(max-width: 900px) 161vw, 860px`），照框宽本身写会让浏览器挑小图。
 
 **代码块颜色不跟着夜间模式变。** `astro.config.ts` 配的是 `shikiConfig.themes: { light, dark }`，浅色值直接写进 `style="color:…"`，暗色值只挂在 `--shiki-dark` 上；Astro 在这种情况下不输出任何切换样式表，所以 `main.css` 里用 `[data-theme='night'] .prose pre span { color: var(--shiki-dark) !important }` 接管。换主题名只改 config 那两个字符串，别在 CSS 里写死色值。
+
+**换了 favicon 浏览器不更新。** `public/` 下的文件是原样拷贝、没有内容哈希，URL 一成不变，而 Chrome 的 favicon 缓存能撑好几天。所以 `Layout.astro` 在构建时读 `public/assets/favicon.svg` 算 sha256 前 8 位当查询参数（`favicon.svg?v=1da72b97`），图标一改 URL 就变，不用手动 bump 版本号。往 `public/` 里加别的图标类资源时同理。
 
 **字体没加载。** 标题用 Google Fonts 的 Archivo（含斜体）+ Noto Sans SC，等宽是 JetBrains Mono。访问不了会回落到系统中文字体，排版略偏但仍可用。彻底离线就把字体下载进 `src/assets/fonts/` 并改 `main.css` 顶部的 `--font-*`。

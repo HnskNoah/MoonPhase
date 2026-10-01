@@ -32,7 +32,7 @@ const ROMAN: [number, string][] = [
   [1, 'I'],
 ]
 
-/** 1 -> I，4 -> IV（P3R 社群列表那种角标） */
+/** 1 -> I，4 -> IV（卡片左上角那种罗马数字角标） */
 export function roman(n: number): string {
   if (!Number.isFinite(n) || n < 1 || n > 39) return String(n)
   let out = ''

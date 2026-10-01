@@ -1,9 +1,22 @@
 ---
+import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
 import '../styles/main.css'
 import { getImage } from 'astro:assets'
 import abyss from '../assets/abyss.jpg'
 import { config } from '../consts'
 import { u, fmtDateLatin } from '../lib/site'
+
+/**
+ * favicon 在 public/ 下是原样拷贝，没有内容哈希，URL 一成不变 —— 换图标会被
+ * 浏览器的 favicon 缓存黏好几天。这里按文件内容算个短哈希当查询参数：
+ * 图标一改 URL 就跟着改，不用记得手动去 bump 版本号。
+ */
+const faviconV = createHash('sha256')
+  .update(readFileSync(fileURLToPath(new URL('../../public/assets/favicon.svg', import.meta.url))))
+  .digest('hex')
+  .slice(0, 8)
 
 interface Props {
   title?: string
@@ -52,7 +65,7 @@ const discImg = await getImage({ src: abyss, width: 1000, format: 'webp' })
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta name="theme-color" content="#04101f" />
-    <link rel="icon" href={u('/assets/favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={`${u('/assets/favicon.svg')}?v=${faviconV}`} type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={config.title} href={u('/rss.xml')} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -81,7 +94,7 @@ const discImg = await getImage({ src: abyss, width: 1000, format: 'webp' })
       <div class="sea-grain"></div>
     </div>
 
-    <!-- P3R 菜单那种出血到画面外的巨型裁切字母，当水印用 -->
+    <!-- 出血到画面外的巨型裁切字母，当水印用 -->
     <div class="glyphs" aria-hidden="true">
       <b>{config.latinTitle}</b>
     </div>

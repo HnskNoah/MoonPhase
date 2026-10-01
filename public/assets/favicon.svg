@@ -1,4 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="月相">
+  <!-- 与顶栏品牌徽标同一份几何：外环 r=14.6 + 盘面 r=10.5 + 白→钴蓝竖向渐变 + 一个偏左的缺口。
+       缺口位置固定（徽标里由 JS 按真实月相推动，静态图标不跟着变，否则每次看都是不同东西）。
+       底色取 theme-color 同一个 #04101f，标签页与地址栏配色能接上。 -->
   <defs>
     <clipPath id="c"><circle cx="16" cy="16" r="10.5"/></clipPath>
     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
@@ -6,9 +9,8 @@
       <stop offset="1" stop-color="#122c68"/>
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="7" fill="#04101d"/>
-  <circle cx="16" cy="16" r="14.6" fill="none" stroke="#35c6f5" stroke-width="1.4" opacity=".5"/>
+  <rect width="32" height="32" rx="7" fill="#04101f"/>
+  <circle cx="16" cy="16" r="14.6" fill="none" stroke="#35c6f5" stroke-width="1.4" opacity=".45"/>
   <circle cx="16" cy="16" r="10.5" fill="url(#g)"/>
-  <g clip-path="url(#c)"><circle cx="2.5" cy="16" r="10.5" fill="#04101d"/></g>
-  <path d="M6.5 28.4c2.6-1.4 4.6.9 7-.4" fill="none" stroke="#35c6f5" stroke-width="1.6" stroke-linecap="round"/>
+  <g clip-path="url(#c)"><circle cx="2.5" cy="16" r="10.5" fill="#04101f"/></g>
 </svg>
